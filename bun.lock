@@ -84,6 +84,11 @@
     "packages/memory": {
       "name": "@sengra/memory",
       "version": "0.1.0",
+      "dependencies": {
+        "@sengra/graph": "workspace:*",
+        "@sengra/schema": "workspace:*",
+        "zod": "^3.24.2",
+      },
     },
     "packages/policy": {
       "name": "@sengra/policy",

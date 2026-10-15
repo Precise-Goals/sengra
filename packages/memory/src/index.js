@@ -1,33 +1,29 @@
 /**
- * @file Memory recall and audit recording operations.
+ * @file packages/memory/src/index.js
+ * @description Main export for @sengra/memory: cases, decisions, and cross-session recall.
  */
 
-/**
- * Recalls prior case history and memory for an entity.
- * @param {string} entityId
- * @returns {Promise<{ entityId: string; priorCases: any[]; cleared: boolean }>}
- */
-export async function recallEntity(entityId) {
-  return {
-    entityId,
-    priorCases: [],
-    cleared: false,
-  };
-}
+import { saveCase, getCase } from "./cases.js";
+import { saveDecision, getDecisionsForEntity } from "./decisions.js";
+import { findPastInvestigations } from "./recall.js";
+import { clearMemoryStore, getMemoryStore } from "./store.js";
 
-/**
- * Records a final investigation decision to the audit trail.
- * @param {{ caseId: string; action: string; evidencePath: any[] }} decision
- * @returns {Promise<{ recorded: boolean; timestamp: number }>}
- */
-export async function recordDecision(decision) {
-  return {
-    recorded: true,
-    timestamp: Date.now(),
-  };
-}
+export {
+  saveCase,
+  getCase,
+  saveDecision,
+  getDecisionsForEntity,
+  findPastInvestigations,
+  clearMemoryStore,
+  getMemoryStore,
+};
 
 export default {
-  recallEntity,
-  recordDecision,
+  saveCase,
+  getCase,
+  saveDecision,
+  getDecisionsForEntity,
+  findPastInvestigations,
+  clearMemoryStore,
+  getMemoryStore,
 };

@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ["falkordb"],
   transpilePackages: [
     "@sengra/graph",
     "@sengra/schema",

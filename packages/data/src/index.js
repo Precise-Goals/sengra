@@ -1,21 +1,11 @@
 /**
- * @file Deterministic synthetic graph data generator.
+ * @file packages/data/src/index.js
+ * @description Exports for @sengra/data package.
  */
 
-/**
- * Generates synthetic domain graph datasets for seeding and testing.
- * @param {{ seed?: number; accountCount?: number }} [options]
- * @returns {{ accounts: any[]; devices: any[]; transactions: any[]; groundTruth: any[] }}
- */
-export function generateSyntheticData(options = {}) {
-  return {
-    accounts: [],
-    devices: [],
-    transactions: [],
-    groundTruth: [],
-  };
-}
-
-export default {
-  generateSyntheticData,
-};
+export * from "./generator.js";
+export * from "./ground-truth.js";
+export * from "./seed.js";
+export { default as GROUND_TRUTH } from "./ground-truth.js";
+export { default as generateSyntheticData } from "./generator.js";
+export { default as seedDatabase } from "./seed.js";

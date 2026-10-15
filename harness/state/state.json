@@ -6,8 +6,8 @@
     "harness_md_sha": "af37da276d67a52fc1eb2b9191dd2ba32ddff706ddc6c7922830f3e95fd3672d"
   },
   "mode": "EXECUTE",
-  "sprint": 4,
-  "task_id": "T-0012",
+  "sprint": 5,
+  "task_id": "T-0013",
   "current_stage": "done",
   "stages": {
     "spec": "done",

@@ -5,5 +5,12 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js"
+  },
+  "dependencies": {
+    "@sengra/agent": "workspace:*",
+    "@sengra/analysis": "workspace:*",
+    "@sengra/data": "workspace:*",
+    "@sengra/policy": "workspace:*",
+    "@sengra/schema": "workspace:*"
   }
 }

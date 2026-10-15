@@ -74,6 +74,13 @@
     "packages/eval": {
       "name": "@sengra/eval",
       "version": "0.1.0",
+      "dependencies": {
+        "@sengra/agent": "workspace:*",
+        "@sengra/analysis": "workspace:*",
+        "@sengra/data": "workspace:*",
+        "@sengra/policy": "workspace:*",
+        "@sengra/schema": "workspace:*",
+      },
     },
     "packages/graph": {
       "name": "@sengra/graph",

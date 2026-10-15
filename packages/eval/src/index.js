@@ -1,21 +1,16 @@
 /**
- * @file Evaluation harness comparing baseline agent vs graph-native agent.
+ * @file packages/eval/src/index.js
+ * @description Main export for @sengra/eval: baseline agent and comparative benchmarks.
  */
 
-/**
- * Evaluates investigation outcomes against ground truth.
- * @param {any[]} [groundTruth]
- * @param {any[]} [agentDecisions]
- * @returns {{ precision: number; recall: number; f1: number }}
- */
-export function computeMetrics(groundTruth = [], agentDecisions = []) {
-  return {
-    precision: 1.0,
-    recall: 1.0,
-    f1: 1.0,
-  };
-}
+import { evaluateBaseline, compareAgentVsBaseline } from "./baseline.js";
+
+export {
+  evaluateBaseline,
+  compareAgentVsBaseline,
+};
 
 export default {
-  computeMetrics,
+  evaluateBaseline,
+  compareAgentVsBaseline,
 };

@@ -5,9 +5,9 @@
     "raw_md_sha": "dbf89ac9302b8e18b858c7d950daddb62647b13f960ebc9d16ea046368813392",
     "harness_md_sha": "af37da276d67a52fc1eb2b9191dd2ba32ddff706ddc6c7922830f3e95fd3672d"
   },
-  "mode": "SCAFFOLD",
-  "sprint": 0,
-  "task_id": "T-0000",
+  "mode": "EXECUTE",
+  "sprint": 1,
+  "task_id": "T-0002",
   "current_stage": "done",
   "stages": {
     "spec": "done",
@@ -16,12 +16,11 @@
     "tests": "done",
     "build": "done",
     "review": "done",
-    "qa": "done",
-    "librarian": "done"
+    "qa": "done"
   },
   "lanes": [],
   "attempts": {
-    "scaffold": 1,
+    "spec": 1,
     "build": 1,
     "review": 1,
     "qa": 1

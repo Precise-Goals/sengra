@@ -196,6 +196,12 @@ export default function DarkOpsConsole() {
           >
             Benchmark View &rarr;
           </Link>
+          <Link
+            href="/security"
+            className="px-2.5 py-1 rounded bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs font-mono transition-colors"
+          >
+            Security Ops &rarr;
+          </Link>
         </div>
       </header>
 

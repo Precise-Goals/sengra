@@ -1,0 +1,15 @@
+/**
+ * @file Shared configuration settings for SENGRA monorepo.
+ */
+
+export const prettierConfig = {
+  semi: true,
+  singleQuote: false,
+  tabWidth: 2,
+  trailingComma: "es5",
+  printWidth: 100,
+};
+
+export default {
+  prettierConfig,
+};

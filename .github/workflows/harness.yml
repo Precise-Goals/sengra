@@ -1,0 +1,28 @@
+name: Harness Integrity & Gates
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  harness-gate:
+    name: Gate G0 (Harness Integrity)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Harness Test Dependencies
+        run: pip install pytest pyyaml
+
+      - name: Run Deterministic Harness Linter (G0)
+        run: python scripts/check_harness.py
+
+      - name: Run Harness Unit Tests (G0)
+        run: pytest tests/harness

@@ -49,3 +49,7 @@ __pycache__/
 *.pyo
 .pytest_cache/
 
+# turborepo
+.turbo/
+**/.turbo/
+

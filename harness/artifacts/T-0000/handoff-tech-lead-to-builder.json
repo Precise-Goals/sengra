@@ -1,0 +1,36 @@
+{
+  "task_id": "T-0000",
+  "from": "tech-lead",
+  "to": "builder",
+  "artifact": "harness/artifacts/T-0000/03-plan.md",
+  "status": "complete",
+  "summary": "Technical implementation plan for monorepo and Turborepo setup (T-0000). Decomposed into single monorepo lane with exclusive file ownership covering root workspace, apps/web relocation, and packages skeletons.",
+  "inputs_consumed": [
+    "01-spec.md",
+    "02-design.md"
+  ],
+  "acceptance_refs": [
+    "AC-000-a",
+    "AC-000-b",
+    "AC-000-c",
+    "AC-000-d"
+  ],
+  "open_questions": [],
+  "assumptions": [],
+  "files_touched": [
+    "harness/artifacts/T-0000/03-plan.md",
+    "harness/state/locks/monorepo.json",
+    "harness/artifacts/T-0000/handoff-tech-lead-to-builder.json"
+  ],
+  "checks_run": [
+    {
+      "cmd": "python scripts/check_harness.py",
+      "exit": 0
+    },
+    {
+      "cmd": "python scripts/guard_paths.py --role tech-lead --files harness/artifacts/T-0000/03-plan.md harness/state/locks/monorepo.json harness/artifacts/T-0000/handoff-tech-lead-to-builder.json",
+      "exit": 0
+    }
+  ],
+  "next_expected_artifact": "05-build.md"
+}

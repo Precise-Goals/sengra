@@ -16,9 +16,10 @@
     "test:integration": "turbo run test:integration",
     "check-types": "turbo run check-types",
     "format": "prettier --check \"**/*.{js,jsx,json,md,yaml}\"",
-    "format:fix": "prettier --write \"**/*.{js,jsx,json,md,yaml}\"",
     "seed": "turbo run seed",
-    "eval": "turbo run eval"
+    "eval": "turbo run eval",
+    "demo": "node scripts/demo.js",
+    "verify:gates": "python scripts/verify_gates.py"
   },
   "devDependencies": {
     "turbo": "^2.4.0",

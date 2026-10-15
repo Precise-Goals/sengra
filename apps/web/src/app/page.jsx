@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   GraphCanvas,
   toCytoscapeElements,
@@ -189,6 +190,12 @@ export default function DarkOpsConsole() {
             <span className="text-zinc-500">POLICY:</span>
             <span className="text-amber-400">Rule F4 Enforced</span>
           </div>
+          <Link
+            href="/compare"
+            className="px-2.5 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-mono transition-colors"
+          >
+            Benchmark View &rarr;
+          </Link>
         </div>
       </header>
 

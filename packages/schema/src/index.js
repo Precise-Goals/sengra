@@ -68,24 +68,8 @@ export const RuleSchema = z.object({
   severity: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).default("MEDIUM"),
 });
 
-// Security Nodes (Bonus Layer)
-export const ServiceSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  criticality: z.enum(["low", "medium", "high", "critical"]).default("medium"),
-});
-
-export const CVESchema = z.object({
-  id: z.string(),
-  cvss: z.number().min(0).max(10),
-  description: z.string().optional(),
-});
-
-export const CredentialSchema = z.object({
-  id: z.string(),
-  type: z.string().default("password_hash"),
-  leaked: z.boolean().default(false),
-});
+// Security Nodes & Tools (Bonus Layer)
+export * from "./security.js";
 
 // ==============================================================================
 // 2. Generic Graph Subgraph Schemas

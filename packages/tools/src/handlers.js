@@ -6,7 +6,13 @@
 import { analyzeSubgraph, crossCheckComponents } from "@sengra/analysis";
 import { evaluateFreezePolicy, skepticCheck } from "@sengra/policy";
 import { roQueryGraph, getDb } from "@sengra/graph";
-import { assertReadOnlyCypher } from "./security.js";
+import {
+  assertReadOnlyCypher,
+  cveToFraudLinks,
+  calculateBlastRadius,
+  evaluateFindingPriority,
+  whoKnowsSystem,
+} from "./security.js";
 
 
 /**
@@ -196,6 +202,10 @@ export const TOOL_HANDLERS = {
   notify: handleNotify,
   record_decision: handleRecordDecision,
   run_cypher_readonly: handleRunCypherReadonly,
+  cve_to_fraud_links: async (params) => cveToFraudLinks(params),
+  blast_radius: async (params) => calculateBlastRadius(params),
+  evaluate_finding_priority: async (params) => evaluateFindingPriority(params),
+  who_knows_system: async (params) => whoKnowsSystem(params),
 };
 
 export default TOOL_HANDLERS;

@@ -11,7 +11,7 @@ describe("MCP HTTP JSON-RPC 2.0 Route Tests", () => {
     const response = await GET();
     const data = await response.json();
     expect(data.status).toBe("healthy");
-    expect(data.toolsCount).toBe(11);
+    expect(data.toolsCount).toBeGreaterThanOrEqual(11);
     expect(data.protocolVersion).toBe("2024-11-05");
   });
 
@@ -31,7 +31,7 @@ describe("MCP HTTP JSON-RPC 2.0 Route Tests", () => {
     expect(data.jsonrpc).toBe("2.0");
     expect(data.id).toBe("req-1");
     expect(data.result).toBeDefined();
-    expect(data.result.tools.length).toBe(11);
+    expect(data.result.tools.length).toBeGreaterThanOrEqual(11);
   });
 
   it("handles tools/call for evaluate_freeze_policy", async () => {

@@ -164,6 +164,52 @@ export const TOOL_CATALOG = [
       required: ["query"],
     },
   },
+  {
+    name: "cve_to_fraud_links",
+    description: "Trace cross-domain graph query connecting CVE vulnerability to compromised accounts via leaked credentials.",
+    parameters: {
+      type: "object",
+      properties: {
+        cveId: { type: "string", description: "CVE identifier (e.g. CVE-2024-3094)." },
+        serviceId: { type: "string", description: "Vulnerable service ID." },
+      },
+    },
+  },
+  {
+    name: "blast_radius",
+    description: "Calculate downstream service dependencies and affected datastores from a compromised service.",
+    parameters: {
+      type: "object",
+      properties: {
+        serviceId: { type: "string", description: "Vulnerable service ID." },
+      },
+    },
+  },
+  {
+    name: "evaluate_finding_priority",
+    description: "Calculate finding priority score factoring in exposure, data sensitivity, and live fraud linkage.",
+    parameters: {
+      type: "object",
+      properties: {
+        cveId: { type: "string", description: "CVE identifier." },
+        cvss: { type: "number", minimum: 0, maximum: 10, description: "CVSS base score." },
+        isInternetExposed: { type: "boolean", description: "Whether service is exposed to public internet." },
+        hasCustomerPII: { type: "boolean", description: "Whether service handles customer PII." },
+        isFraudLinked: { type: "boolean", description: "Whether vulnerability is actively linked to financial fraud." },
+      },
+      required: ["cveId", "cvss"],
+    },
+  },
+  {
+    name: "who_knows_system",
+    description: "Identify owning engineering team, tech lead, and on-call responders for incident paging.",
+    parameters: {
+      type: "object",
+      properties: {
+        serviceId: { type: "string", description: "Target service ID." },
+      },
+    },
+  },
 ];
 
 export default TOOL_CATALOG;

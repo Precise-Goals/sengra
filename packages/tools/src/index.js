@@ -5,7 +5,13 @@
 
 import { TOOL_CATALOG } from "./catalog.js";
 import { TOOL_HANDLERS } from "./handlers.js";
-import { assertReadOnlyCypher } from "./security.js";
+import {
+  assertReadOnlyCypher,
+  cveToFraudLinks,
+  calculateBlastRadius,
+  evaluateFindingPriority,
+  whoKnowsSystem,
+} from "./security.js";
 
 /**
  * Validates tool parameters against the catalog's required fields.
@@ -70,10 +76,15 @@ export async function executeTool(toolName, params = {}) {
   }
 }
 
+
 export {
   TOOL_CATALOG,
   TOOL_HANDLERS,
   assertReadOnlyCypher,
+  cveToFraudLinks,
+  calculateBlastRadius,
+  evaluateFindingPriority,
+  whoKnowsSystem,
 };
 
 export default {
@@ -82,4 +93,8 @@ export default {
   executeTool,
   validateToolParams,
   assertReadOnlyCypher,
+  cveToFraudLinks,
+  calculateBlastRadius,
+  evaluateFindingPriority,
+  whoKnowsSystem,
 };

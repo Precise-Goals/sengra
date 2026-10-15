@@ -202,6 +202,12 @@ export default function DarkOpsConsole() {
           >
             Security Ops &rarr;
           </Link>
+          <Link
+            href="/memory"
+            className="px-2.5 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-colors"
+          >
+            Memory Explorer &rarr;
+          </Link>
         </div>
       </header>
 

@@ -97,6 +97,11 @@ def check_guard(role_name, files=None, root=ROOT):
     if not allowed_patterns:
         return [f"Role '{role_name}' has no allowed paths defined or role file is missing."]
 
+    lane_locks = get_lane_locks(root)
+    for path, owner in lane_locks.items():
+        if owner == role_name:
+            allowed_patterns.append(path)
+
     if files is None:
         files = get_git_diff_files(root)
 

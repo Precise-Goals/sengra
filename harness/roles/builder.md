@@ -26,6 +26,10 @@ Implements minimal, clean production code to turn red tests green within assigne
 - packages/**
 - apps/**
 - harness/artifacts/**
+- package.json
+- pnpm-workspace.yaml
+- turbo.json
+- eslint.config.mjs
 
 ## Forbidden
 - Modifying test assertions in `tests/**` (must request changes from Test Author).

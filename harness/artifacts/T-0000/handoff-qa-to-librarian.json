@@ -1,0 +1,40 @@
+{
+  "task_id": "T-0000",
+  "from": "qa",
+  "to": "librarian",
+  "artifact": "harness/artifacts/T-0000/07-qa.md",
+  "status": "complete",
+  "summary": "Full QA evaluation complete. Verified all acceptance criteria (AC-000-a through AC-000-d) with deterministic test evidence. Quality Gates G0 through G4 are green. Produced 07-qa.md with verdict PASS.",
+  "inputs_consumed": [
+    "06-review.md",
+    "06b-security.md",
+    "08-docs.md"
+  ],
+  "acceptance_refs": [
+    "AC-000-a",
+    "AC-000-b",
+    "AC-000-c",
+    "AC-000-d"
+  ],
+  "open_questions": [],
+  "assumptions": [],
+  "files_touched": [
+    "harness/artifacts/T-0000/07-qa.md",
+    "harness/artifacts/T-0000/handoff-qa-to-librarian.json"
+  ],
+  "checks_run": [
+    {
+      "cmd": "python scripts/guard_paths.py --role qa --files harness/artifacts/T-0000/07-qa.md harness/artifacts/T-0000/handoff-qa-to-librarian.json",
+      "exit": 0
+    },
+    {
+      "cmd": "python scripts/check_harness.py",
+      "exit": 0
+    },
+    {
+      "cmd": "pytest tests/harness",
+      "exit": 0
+    }
+  ],
+  "next_expected_artifact": "docs/memory/lessons.md"
+}

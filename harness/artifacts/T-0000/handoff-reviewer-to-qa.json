@@ -1,0 +1,39 @@
+{
+  "task_id": "T-0000",
+  "from": "reviewer",
+  "to": "qa",
+  "artifact": "harness/artifacts/T-0000/06-review.md",
+  "status": "complete",
+  "summary": "Completed static code review for Task T-0000 with 0 BLOCKER, 0 MAJOR, and 0 MINOR findings. Confirmed full ESM compliance, accurate Turborepo configuration, and zero scope creep.",
+  "inputs_consumed": [
+    "05-build.md",
+    "03-plan.md"
+  ],
+  "acceptance_refs": [
+    "AC-000-a",
+    "AC-000-b",
+    "AC-000-c",
+    "AC-000-d"
+  ],
+  "open_questions": [],
+  "assumptions": [],
+  "files_touched": [
+    "harness/artifacts/T-0000/06-review.md",
+    "harness/artifacts/T-0000/handoff-reviewer-to-qa.json"
+  ],
+  "checks_run": [
+    {
+      "cmd": "python scripts/guard_paths.py --role reviewer --files harness/artifacts/T-0000/06-review.md harness/artifacts/T-0000/handoff-reviewer-to-qa.json",
+      "exit": 0
+    },
+    {
+      "cmd": "python scripts/check_harness.py",
+      "exit": 0
+    },
+    {
+      "cmd": "pytest tests/harness",
+      "exit": 0
+    }
+  ],
+  "next_expected_artifact": "07-qa.md"
+}

@@ -175,6 +175,12 @@ export default function ComparePage() {
             Security Ops &rarr;
           </Link>
           <Link
+            href="/memory"
+            className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-colors"
+          >
+            Memory &rarr;
+          </Link>
+          <Link
             href="/"
             className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors flex items-center gap-1.5"
           >

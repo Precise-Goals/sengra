@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SENGRA: Graph-Native Fraud Agent
+
+> Hackathon track: **Agents that act on connected data**
+> Powered by **FalkorDB Cloud**, **Model Context Protocol (MCP)**, **Vercel AI SDK (Claude)**, **Cytoscape.js**, and in-process **Graphology** analytics.
+
+---
+
+## Overview
+
+SENGRA is an autonomous fraud ring investigation agent that discovers organized fraud by following multi-hop relationships in a graph database, runs graph algorithms (WCC, PageRank, Louvain communities, betweenness centrality) as tools, remembers learned entities across sessions, and animates the exact evidence path behind every decision in a real-time dark ops console.
+
+### Key Capabilities
+- **Multi-Hop Traversal**: Connects transactions, accounts, devices, cards, and physical addresses to detect rings.
+- **Dual-Path Compute**: In-database algorithms (`algo.WCC`, `algo.pageRank` in FalkorDB Cloud) + in-process analytics (Louvain, betweenness in Graphology).
+- **Deterministic Policy Gates**: Strict graph evidence gates (`FREEZE`, `HOLD`, `NO_ACTION`) with a **Skeptic Check** clearing benign clusters (e.g. family sharing IP/address).
+- **Cross-Session Memory**: Recalls past investigations, clearances, and learned patterns from the `agent_memory` graph.
+- **Visual Explainability**: Every decision animates an edge-by-edge evidence path in Cytoscape.js.
+- **Security Bonus Layer**: Bridges unpatched Internet-exposed services and CVEs through compromised credentials to live financial fraud.
+
+---
+
+## Monorepo Layout
+
+```
+sengra/
+  apps/
+    web/                  # Next.js 16 App Router UI & API routes (/api/chat, /api/mcp)
+  packages/
+    graph/                # FalkorDB client singleton & query builders
+    schema/               # Zod schemas & JSDoc types for entities, edges, tool I/O
+    tools/                # MCP tool definitions and handlers
+    policy/               # Pure deterministic policy and skeptic rules
+    memory/               # Agent memory recall and record operations
+    analysis/             # Graphology in-process subgraph analytics
+    data/                 # Seeded synthetic generator & ground truth
+    agent/                # Prompts, agent loop, and baseline flat agent
+    ui/                   # Shared React/Tailwind/shadcn UI components
+    eval/                 # Metrics evaluation comparing graph vs baseline
+    config/               # Shared ESLint, Prettier, and JSConfig
+  docs/                   # Specifications, architecture, and memory logs
+  harness/                # Autonomous agent harness, roles, and state
+  scripts/                # Quality gate linters and circuit breakers
+```
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 20+ and `pnpm` (or `bun`)
+- Python 3.10+ (for harness verification)
+- FalkorDB Cloud account (managed TLS instance)
+- Anthropic API Key (for Claude 3.5 Sonnet)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Canonical Commands
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Purpose | Command |
+|---|---|
+| Install dependencies | `pnpm install` |
+| Lint codebase | `pnpm turbo run lint` |
+| Format check | `pnpm prettier --check "**/*.{js,jsx,json,md,yaml}"` |
+| Type check | `pnpm turbo run check-types` |
+| Run unit tests | `pnpm turbo run test` |
+| Run integration tests | `pnpm turbo run test:integration` |
+| Build all applications | `pnpm turbo run build` |
+| Harness self-test | `python scripts/check_harness.py && pytest tests/harness` |
+| Seed synthetic data | `pnpm seed` |
+| Run baseline evaluation | `pnpm eval` |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Documentation Links
+- Operating Manual: [docs/prompt.md](docs/prompt.md)
+- Single Source of Truth: [docs/harness.md](docs/harness.md)
+- Problem Statement: [docs/raw.md](docs/raw.md)
+- Agent Navigation Map: [AGENTS.md](AGENTS.md)

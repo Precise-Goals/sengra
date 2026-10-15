@@ -8,24 +8,35 @@
   "mode": "SCAFFOLD",
   "sprint": 0,
   "task_id": "T-0000",
-  "current_stage": "scaffold",
+  "current_stage": "done",
   "stages": {
     "spec": "done",
     "design": "done",
     "plan": "done",
     "tests": "done",
-    "build": "in_progress"
+    "build": "done",
+    "review": "done",
+    "qa": "done",
+    "librarian": "done"
   },
   "lanes": [],
   "attempts": {
-    "scaffold": 1
+    "scaffold": 1,
+    "build": 1,
+    "review": 1,
+    "qa": 1
   },
-  "last_commit": "abd478c8cbb7f9e28ff20ec0b861b94a93de3353",
-  "last_gate": null,
+  "last_commit": "0b925a8",
+  "last_gate": {
+    "name": "gate0",
+    "status": "pass",
+    "at": "2026-10-16T03:13:30Z",
+    "log": "scripts/check_harness.py && pytest tests/harness"
+  },
   "breaker": {
     "tripped": false,
     "reason": null,
     "tripped_at": null
   },
-  "updated_at": "2026-10-16T03:08:00Z"
+  "updated_at": "2026-10-16T03:13:40Z"
 }

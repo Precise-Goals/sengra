@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { GraphCanvas, toCytoscapeElements } from "@sengra/ui";
+import {
+  GraphCanvas,
+  toCytoscapeElements,
+  CaseCard,
+  TracePanel,
+  MetricsBar,
+} from "@sengra/ui";
 
 const DEMO_SCENARIOS = {
   ringA: {
@@ -183,6 +189,7 @@ export default function DarkOpsConsole() {
                 return (
                   <button
                     key={key}
+                    type="button"
                     onClick={() => handleSelectScenario(key)}
                     className={`text-left p-3 rounded-lg border transition-all ${
                       isActive
@@ -213,6 +220,7 @@ export default function DarkOpsConsole() {
               {["concentric", "breadthfirst", "circle"].map((name) => (
                 <button
                   key={name}
+                  type="button"
                   onClick={() => setLayoutName(name)}
                   className={`text-xs capitalize py-1.5 px-3 rounded border font-mono transition-all ${
                     layoutName === name
@@ -228,6 +236,7 @@ export default function DarkOpsConsole() {
 
           <div className="mt-auto pt-4 border-t border-zinc-800">
             <button
+              type="button"
               onClick={handleRunInvestigation}
               disabled={isInvestigating}
               className={`w-full py-2.5 px-4 rounded-lg font-mono text-xs font-bold transition-all shadow-lg flex items-center justify-center gap-2 ${
@@ -251,10 +260,16 @@ export default function DarkOpsConsole() {
           </div>
         </aside>
 
-        {/* Center: Interactive Cytoscape Canvas */}
+        {/* Center: Interactive Cytoscape Canvas & Metrics Bar */}
         <main className="flex-1 flex flex-col relative bg-zinc-950">
+          <MetricsBar
+            metrics={investigationResult?.metrics}
+            nodeCount={currentScenario.nodes.length}
+            edgeCount={currentScenario.edges.length}
+          />
+
           {/* Canvas Toolbar & Legend */}
-          <div className="absolute top-4 left-4 z-10 flex items-center gap-4 px-3 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/90 backdrop-blur text-xs font-mono">
+          <div className="absolute top-12 left-4 z-10 flex items-center gap-4 px-3 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/90 backdrop-blur text-xs font-mono">
             <div className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />
               <span className="text-zinc-300">Account</span>
@@ -277,12 +292,14 @@ export default function DarkOpsConsole() {
             </div>
           </div>
 
-          <GraphCanvas
-            elements={cytoscapeElements}
-            layoutName={layoutName}
-            onNodeClick={(data) => setSelectedNode(data)}
-            highlightedNodeIds={highlightedNodeIds}
-          />
+          <div className="flex-1 relative">
+            <GraphCanvas
+              elements={cytoscapeElements}
+              layoutName={layoutName}
+              onNodeClick={(data) => setSelectedNode(data)}
+              highlightedNodeIds={highlightedNodeIds}
+            />
+          </div>
 
           {/* Node Inspector Floating Pill */}
           {selectedNode && (
@@ -290,6 +307,7 @@ export default function DarkOpsConsole() {
               <div className="flex items-center justify-between border-b border-zinc-800 pb-1.5 mb-1.5">
                 <span className="font-bold text-cyan-400">{selectedNode.label}: {selectedNode.id}</span>
                 <button
+                  type="button"
                   onClick={() => setSelectedNode(null)}
                   className="text-zinc-500 hover:text-zinc-200"
                 >
@@ -304,75 +322,18 @@ export default function DarkOpsConsole() {
           )}
         </main>
 
-        {/* Right Rail: Investigation Trace & Case Card */}
+        {/* Right Rail: Structured CaseCard & TracePanel */}
         <aside className="w-96 border-l border-zinc-800 bg-zinc-900/60 p-4 flex flex-col gap-4 overflow-y-auto">
-          <h2 className="text-xs font-mono uppercase text-zinc-400 tracking-wider">
-            Agent Reasoning & Audit Trail
-          </h2>
-
           {investigationResult ? (
-            <div className="flex flex-col gap-3">
-              {/* Decision Verdict Badge */}
-              <div
-                className={`p-3 rounded-lg border ${
-                  investigationResult.decision === "FREEZE"
-                    ? "border-red-500/40 bg-red-950/20 text-red-300"
-                    : investigationResult.decision === "NO_ACTION"
-                    ? "border-emerald-500/40 bg-emerald-950/20 text-emerald-300"
-                    : "border-amber-500/40 bg-amber-950/20 text-amber-300"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-mono tracking-widest uppercase">
-                    POLICY VERDICT
-                  </span>
-                  <span className="text-xs font-bold font-mono">
-                    CONFIDENCE: {Math.round(investigationResult.confidence * 100)}%
-                  </span>
-                </div>
-                <div className="text-xl font-black font-mono tracking-tight">
-                  {investigationResult.decision}
-                </div>
-                <div className="text-[11px] mt-1 text-zinc-300 leading-relaxed font-sans">
-                  {investigationResult.explanation}
-                </div>
-              </div>
-
-              {/* Action Ledger */}
-              <div className="p-3 rounded-lg border border-zinc-800 bg-zinc-950/40 font-mono text-xs">
-                <div className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">
-                  Action Executed
-                </div>
-                <div className="text-cyan-400 font-semibold">{investigationResult.actionTaken}</div>
-                {investigationResult.skepticCleared && (
-                  <div className="text-[11px] text-emerald-400 mt-1">
-                    ✓ Cleared via Skeptic Challenge (Benign Explanation Confirmed)
-                  </div>
-                )}
-              </div>
-
-              {/* Execution Trace */}
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">
-                  Multi-Step Trace ({investigationResult.trace?.length || 0} steps)
-                </div>
-                <div className="space-y-2">
-                  {investigationResult.trace?.map((step, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2.5 rounded border border-zinc-800/80 bg-zinc-950/60 font-mono text-[11px]"
-                    >
-                      <div className="flex items-center justify-between text-cyan-400 font-semibold mb-1">
-                        <span>{idx + 1}. {step.tool}</span>
-                        <span className="text-[9px] text-zinc-600">OK</span>
-                      </div>
-                      <div className="text-zinc-400 text-[10px] truncate">
-                        IN: {JSON.stringify(step.inputs)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="flex flex-col gap-4">
+              <CaseCard
+                result={investigationResult}
+                onPathSelect={(nodeId) => setSelectedNode({ id: nodeId, label: "Path Step" })}
+              />
+              <TracePanel
+                trace={investigationResult.trace}
+                onStepClick={(step) => console.log("Trace step clicked:", step.toolName)}
+              />
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center flex-1 text-center p-6 text-zinc-600 font-mono text-xs">

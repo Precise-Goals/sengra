@@ -5,5 +5,12 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js"
+  },
+  "dependencies": {
+    "graphology": "^0.26.0",
+    "graphology-communities-louvain": "^2.0.2",
+    "graphology-components": "^1.5.4",
+    "graphology-metrics": "^2.4.2",
+    "graphology-shortest-path": "^2.1.0"
   }
 }

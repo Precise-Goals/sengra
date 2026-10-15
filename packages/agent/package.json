@@ -5,5 +5,15 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.81",
+    "@sengra/analysis": "workspace:*",
+    "@sengra/graph": "workspace:*",
+    "@sengra/policy": "workspace:*",
+    "@sengra/schema": "workspace:*",
+    "@sengra/tools": "workspace:*",
+    "ai": "^7.0.142",
+    "zod": "^3.24.2"
   }
 }

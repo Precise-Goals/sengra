@@ -1,22 +1,20 @@
 /**
- * @file Agent orchestration loop and baseline flat comparison runner.
+ * @file packages/agent/src/index.js
+ * @description Main export for @sengra/agent: system prompt, AI SDK tools, and investigation orchestrator.
  */
 
-export const SYSTEM_PROMPT = `You are SENGRA, an autonomous financial crime intelligence agent.
-Investigate alerts by querying the FalkorDB graph, testing hypotheses with skeptic challenge, and gating actions with deterministic policy.`;
+import { SYSTEM_PROMPT } from "./prompt.js";
+import { createAgentTools } from "./tools.js";
+import { runInvestigation } from "./orchestrator.js";
 
-/**
- * Creates an agent investigation loop.
- * @param {Record<string, any>} [config]
- */
-export function createAgentLoop(config = {}) {
-  return {
-    systemPrompt: SYSTEM_PROMPT,
-    config,
-  };
-}
+export {
+  SYSTEM_PROMPT,
+  createAgentTools,
+  runInvestigation,
+};
 
 export default {
   SYSTEM_PROMPT,
-  createAgentLoop,
+  createAgentTools,
+  runInvestigation,
 };

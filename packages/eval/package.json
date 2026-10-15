@@ -6,6 +6,9 @@
   "exports": {
     ".": "./src/index.js"
   },
+  "scripts": {
+    "eval": "node src/cli.js"
+  },
   "dependencies": {
     "@sengra/agent": "workspace:*",
     "@sengra/analysis": "workspace:*",

@@ -95,6 +95,8 @@ export default function DarkOpsConsole() {
   const [isInvestigating, setIsInvestigating] = useState(false);
   const [investigationResult, setInvestigationResult] = useState(null);
   const [highlightedNodeIds, setHighlightedNodeIds] = useState([]);
+  const [animatingPath, setAnimatingPath] = useState(null);
+  const [activeSubtitle, setActiveSubtitle] = useState(null);
 
   const currentScenario = DEMO_SCENARIOS[activeScenarioKey];
   const cytoscapeElements = toCytoscapeElements(currentScenario.nodes, currentScenario.edges);
@@ -102,6 +104,8 @@ export default function DarkOpsConsole() {
   async function handleRunInvestigation() {
     setIsInvestigating(true);
     setInvestigationResult(null);
+    setAnimatingPath(null);
+    setActiveSubtitle(null);
 
     try {
       const response = await fetch("/api/chat", {
@@ -127,8 +131,10 @@ export default function DarkOpsConsole() {
       const res = await response.json();
       if (res.success && res.data) {
         setInvestigationResult(res.data);
-        if (res.data.evidencePath) {
+        if (res.data.evidencePath && res.data.evidencePath.length > 0) {
           setHighlightedNodeIds(res.data.evidencePath);
+          // Trigger animated path traversal
+          setAnimatingPath([...res.data.evidencePath]);
         }
       }
     } catch (err) {
@@ -138,11 +144,22 @@ export default function DarkOpsConsole() {
     }
   }
 
+  function handleReplayAnimation() {
+    if (investigationResult?.evidencePath && investigationResult.evidencePath.length > 0) {
+      setAnimatingPath(null);
+      setTimeout(() => {
+        setAnimatingPath([...investigationResult.evidencePath]);
+      }, 50);
+    }
+  }
+
   function handleSelectScenario(key) {
     setActiveScenarioKey(key);
     setSelectedNode(null);
     setInvestigationResult(null);
     setHighlightedNodeIds([]);
+    setAnimatingPath(null);
+    setActiveSubtitle(null);
   }
 
   return (
@@ -234,6 +251,18 @@ export default function DarkOpsConsole() {
             </div>
           </div>
 
+          {investigationResult?.evidencePath && (
+            <div className="pt-2 border-t border-zinc-800">
+              <button
+                type="button"
+                onClick={handleReplayAnimation}
+                className="w-full py-2 px-3 rounded border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-xs font-mono flex items-center justify-center gap-2 transition-all"
+              >
+                <span>▶ REPLAY PATH ANIMATION</span>
+              </button>
+            </div>
+          )}
+
           <div className="mt-auto pt-4 border-t border-zinc-800">
             <button
               type="button"
@@ -298,6 +327,12 @@ export default function DarkOpsConsole() {
               layoutName={layoutName}
               onNodeClick={(data) => setSelectedNode(data)}
               highlightedNodeIds={highlightedNodeIds}
+              animatingPath={animatingPath}
+              onAnimationStep={(_, subtitle) => setActiveSubtitle(subtitle)}
+              onAnimationComplete={() => {
+                setTimeout(() => setActiveSubtitle(null), 3000);
+              }}
+              activeSubtitle={activeSubtitle}
             />
           </div>
 
@@ -340,7 +375,7 @@ export default function DarkOpsConsole() {
               <div className="h-8 w-8 rounded-full border border-zinc-800 flex items-center justify-center mb-2">
                 ?
               </div>
-              Select a scenario on the left rail and click "Trigger Investigation" to run multi-step agent reasoning.
+              Select a scenario on the left rail and click "Trigger Investigation" to run multi-step agent reasoning with live animated path traversal.
             </div>
           )}
         </aside>

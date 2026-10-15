@@ -1,0 +1,59 @@
+tools:
+  - name: file_read
+    kind: builtin
+    purpose: Read repository files and documentation
+    allowed_roles: [orchestrator, po-spec, designer, tech-lead, test-author, builder, reviewer, security, qa, scribe, librarian]
+    approval: auto
+
+  - name: file_write
+    kind: builtin
+    purpose: Write code and artifacts within role allow-list
+    allowed_roles: [orchestrator, po-spec, designer, tech-lead, test-author, builder, reviewer, security, qa, scribe, librarian]
+    approval: auto
+    guard: scripts/guard_paths.py
+
+  - name: bash
+    kind: bash
+    purpose: Execute permitted tests, linters, and build tasks
+    allowed_roles: [builder, test-author, qa, security]
+    approval: auto
+    sandbox: harness/tools/sandbox.md
+
+  - name: git
+    kind: bash
+    purpose: Branching, staging, committing and diff verification
+    allowed_roles: [orchestrator, builder]
+    approval: auto
+    forbid:
+      - push --force
+      - reset --hard origin
+
+  - name: package_install
+    kind: bash
+    purpose: Add new workspace dependencies
+    allowed_roles: [builder]
+    approval: confirm
+
+  - name: deploy
+    kind: bash
+    purpose: Deploying application to cloud hosting
+    allowed_roles: []
+    approval: forbidden
+
+  - name: falkordb_ro_query
+    kind: api
+    purpose: Execute read-only Cypher queries via roQuery
+    allowed_roles: [orchestrator, po-spec, designer, tech-lead, test-author, builder, reviewer, security, qa, scribe, librarian]
+    approval: auto
+
+  - name: falkordb_write_query
+    kind: api
+    purpose: Seed synthetic entities or write decisions to database
+    allowed_roles: [builder, orchestrator]
+    approval: auto
+
+  - name: mcp_tool_execution
+    kind: mcp
+    purpose: Execute domain fraud and memory tools via /api/mcp
+    allowed_roles: [builder, qa, test-author]
+    approval: auto

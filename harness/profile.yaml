@@ -1,0 +1,35 @@
+project_type: web-app
+languages:
+  - javascript
+frameworks:
+  - next.js
+  - react
+  - falkordb
+  - graphology
+  - cytoscape.js
+  - tailwindcss
+  - shadcn-ui
+package_manager: pnpm
+has_ui: true
+has_db: true
+has_network_integrations: true
+handles_sensitive_data: false
+deploy_target: cloud
+team_mode: solo
+ci: github-actions
+parallelism: 1
+sprint_length: by-task
+confidence: 1.0
+enabled_roles:
+  - orchestrator
+  - po-spec
+  - designer
+  - tech-lead
+  - test-author
+  - builder
+  - reviewer
+  - security
+  - qa
+  - scribe
+  - librarian
+disabled_roles: []

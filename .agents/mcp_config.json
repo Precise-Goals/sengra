@@ -1,5 +1,23 @@
 {
   "mcpServers": {
+    "falkordb": {
+      "command": "npx",
+      "args": ["-y", "@falkordb/mcpserver@latest"],
+      "env": {
+        "FALKORDB_HOST": "localhost",
+        "FALKORDB_PORT": "6379",
+        "FALKORDB_DEFAULT_READONLY": "false"
+      }
+    },
+    "falkordb-readonly": {
+      "command": "npx",
+      "args": ["-y", "@falkordb/mcpserver@latest"],
+      "env": {
+        "FALKORDB_HOST": "localhost",
+        "FALKORDB_PORT": "6379",
+        "FALKORDB_DEFAULT_READONLY": "true"
+      }
+    },
     "shadcn": {
       "command": "npx",
       "args": ["shadcn@latest", "mcp"]

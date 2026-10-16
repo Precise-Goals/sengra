@@ -72,19 +72,40 @@ export async function decisions(options = {}) {
  * @param {string} cypher - Cypher query string with parameter placeholders
  * @param {Record<string, any>} params - Parameter bindings
  */
-export async function queryGraph(base, cypher, params = {}) {
+export async function queryGraph(baseOrCypher, cypherOrParams, maybeParams = {}) {
+  let base = "domain";
+  let cypher = baseOrCypher;
+  let params = cypherOrParams || {};
+
+  if (baseOrCypher === "domain" || baseOrCypher === "agent_memory" || baseOrCypher === "decisions") {
+    base = baseOrCypher;
+    cypher = cypherOrParams;
+    params = maybeParams || {};
+  }
+
   const graph = await selectGraph(base);
   return graph.query(cypher, { params });
 }
 
 /**
- * Executes a read-only parameterized query using FalkorDB roQuery method.
- * Guarantees database-level mutation rejection.
- * @param {string} base
- * @param {string} cypher
- * @param {Record<string, any>} params
+ * Executes a read-only parameterized query using FalkorDB roQuery method (GRAPH.RO_QUERY).
+ * Guarantees database-level mutation rejection and routes to read replicas.
+ * Supports both (base, cypher, params) and (cypher, params).
+ * @param {string} baseOrCypher
+ * @param {string | Record<string, any>} [cypherOrParams]
+ * @param {Record<string, any>} [maybeParams]
  */
-export async function roQueryGraph(base, cypher, params = {}) {
+export async function roQueryGraph(baseOrCypher, cypherOrParams, maybeParams = {}) {
+  let base = "domain";
+  let cypher = baseOrCypher;
+  let params = cypherOrParams || {};
+
+  if (baseOrCypher === "domain" || baseOrCypher === "agent_memory" || baseOrCypher === "decisions") {
+    base = baseOrCypher;
+    cypher = cypherOrParams;
+    params = maybeParams || {};
+  }
+
   const graph = await selectGraph(base);
   return graph.roQuery(cypher, { params });
 }

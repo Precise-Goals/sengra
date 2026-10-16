@@ -9,6 +9,14 @@
       "maxDuration": 60,
       "memory": 1024
     },
+    "apps/web/src/app/api/sarvam/route.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "apps/web/src/app/api/freeze/route.js": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
     "apps/web/src/app/api/mcp/route.js": {
       "maxDuration": 30,
       "memory": 512

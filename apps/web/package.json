@@ -13,6 +13,8 @@
     "@ai-sdk/anthropic": "^4.0.81",
     "@sengra/agent": "workspace:*",
     "@sengra/eval": "workspace:*",
+    "@sengra/graph": "workspace:*",
+    "@sengra/policy": "workspace:*",
     "@sengra/tools": "workspace:*",
     "@sengra/ui": "workspace:*",
     "ai": "^7.0.142",

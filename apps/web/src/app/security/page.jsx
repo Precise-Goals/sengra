@@ -50,9 +50,16 @@ export default function SecurityPage() {
   });
 
   return (
-    <div className="flex-1 flex flex-col bg-[#020408] text-white py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full selection:bg-purple-500/30 selection:text-purple-200">
+    <div className="relative flex-1 flex flex-col bg-[#020408] text-white py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full selection:bg-purple-500/30 selection:text-purple-200">
+      {/* Background Animated Aurora Glow Mesh */}
+      <div className="aurora-mesh">
+        <div className="aurora-orb-1" />
+        <div className="aurora-orb-2" />
+        <div className="aurora-orb-3" />
+      </div>
+
       {/* Top Incident Status Banner */}
-      <div className="mb-6 liquid-glass p-5 rounded-2xl border border-red-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="mb-6 liquid-glass-extreme laser-scan-line p-5 rounded-2xl border border-red-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-xl font-bold font-sans text-white">

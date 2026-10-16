@@ -403,3 +403,136 @@ body {
   background: rgba(255, 51, 102, 0.08);
   box-shadow: 0 0 12px rgba(255, 51, 102, 0.2), inset 0 1px 0 rgba(255, 51, 102, 0.35);
 }
+
+/* ==========================================================================
+   REACT BITS & ADVANCED LIQUID GLASSMORPHISM EXTENSIONS
+   ========================================================================== */
+
+/* Liquid Glass Extreme (Multi-layer Refraction & Specular Highlights) */
+.liquid-glass-extreme {
+  background: linear-gradient(
+    135deg,
+    rgba(14, 20, 28, 0.65) 0%,
+    rgba(6, 9, 13, 0.85) 100%
+  );
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.6),
+    0 20px 50px rgba(0, 0, 0, 0.7),
+    0 0 25px rgba(0, 255, 102, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-extreme:hover {
+  border-color: rgba(0, 255, 102, 0.45);
+  box-shadow:
+    inset 0 1px 1px 0 rgba(0, 255, 102, 0.5),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.6),
+    0 24px 60px rgba(0, 0, 0, 0.8),
+    0 0 35px rgba(0, 255, 102, 0.2);
+}
+
+/* Aurora Background Ambient Glow Mesh */
+.aurora-mesh {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.aurora-orb-1 {
+  position: absolute;
+  top: -10%;
+  left: 15%;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(0, 255, 102, 0.14) 0%, rgba(0, 255, 102, 0) 70%);
+  filter: blur(65px);
+  animation: aurora-float-1 16s ease-in-out infinite alternate;
+}
+
+.aurora-orb-2 {
+  position: absolute;
+  top: 20%;
+  right: 10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, rgba(6, 182, 212, 0) 70%);
+  filter: blur(80px);
+  animation: aurora-float-2 20s ease-in-out infinite alternate;
+}
+
+.aurora-orb-3 {
+  position: absolute;
+  bottom: 10%;
+  left: 30%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, rgba(168, 85, 247, 0) 70%);
+  filter: blur(75px);
+  animation: aurora-float-1 24s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes aurora-float-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, 40px) scale(1.1); }
+  100% { transform: translate(-40px, 80px) scale(0.95); }
+}
+
+@keyframes aurora-float-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-70px, -30px) scale(1.15); }
+  100% { transform: translate(50px, 60px) scale(0.9); }
+}
+
+/* React Bits Laser Scan Line */
+.laser-scan-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.laser-scan-line::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 102, 0.18) 50%,
+    transparent 100%
+  );
+  animation: laser-scan 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes laser-scan {
+  0% { left: -100%; }
+  50%, 100% { left: 100%; }
+}
+
+/* Neon Glow Outline Box */
+.neon-glow-card {
+  position: relative;
+  background: rgba(8, 12, 17, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.neon-glow-card:hover {
+  border-color: rgba(0, 255, 102, 0.5);
+  box-shadow: 0 0 25px rgba(0, 255, 102, 0.15);
+  transform: translateY(-2px);
+}
+

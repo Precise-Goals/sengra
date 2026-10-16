@@ -275,7 +275,14 @@ export default function DocsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="relative min-h-screen bg-[#040608] text-zinc-100 flex flex-col font-sans selection:bg-[#00ff66]/30 selection:text-white">
+      {/* Background Animated Aurora Glow Mesh */}
+      <div className="aurora-mesh">
+        <div className="aurora-orb-1" />
+        <div className="aurora-orb-2" />
+        <div className="aurora-orb-3" />
+      </div>
+
       {/* Top Header */}
       <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-3">

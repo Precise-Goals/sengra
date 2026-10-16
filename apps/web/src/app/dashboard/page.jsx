@@ -15,6 +15,9 @@ import {
   ArrowRight,
   Maximize2,
   Terminal,
+  CheckCircle2,
+  X,
+  FileCheck,
 } from "lucide-react";
 
 const DEMO_SCENARIOS = {
@@ -173,11 +176,62 @@ export default function DashboardPage() {
     },
   ]);
 
+  // Two-Stage Compliance HITL State
+  const [isFreezeModalOpen, setIsFreezeModalOpen] = useState(false);
+  const [freezeStatusByScenario, setFreezeStatusByScenario] = useState({});
+  const [freezeLoading, setFreezeLoading] = useState(false);
+  const [freezeError, setFreezeError] = useState(null);
+  const [officerName, setOfficerName] = useState("Compliance Officer #402");
+  const [officerNote, setOfficerNote] = useState(
+    "Rule F4 multi-hop evidence verified. Suspect mule account frozen to prevent asset dissipation."
+  );
+
   const activeScenario = DEMO_SCENARIOS[activeKey];
+  const activeFreezeStatus = freezeStatusByScenario[activeKey];
 
   const handleSelectScenario = (key) => {
     setActiveKey(key);
     setSelectedNode(null);
+    setFreezeError(null);
+  };
+
+  const handleExecuteFreeze = async () => {
+    setFreezeLoading(true);
+    setFreezeError(null);
+    try {
+      const res = await fetch("/api/freeze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accountId: activeScenario.targetId,
+          authorizedBy: officerName,
+          officerNote: officerNote,
+          evidencePath: activeScenario.evidencePath,
+          severity: activeScenario.threatLevel,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Freeze mutation failed in FalkorDB");
+      }
+
+      setFreezeStatusByScenario((prev) => ({
+        ...prev,
+        [activeKey]: {
+          status: "EXECUTED_BY_COMPLIANCE",
+          decisionId: data.decisionId,
+          timestamp: data.timestamp,
+          authorizedBy: data.authorizedBy,
+          falkorMutation: data.falkorMutation,
+        },
+      }));
+    } catch (err) {
+      console.error("Freeze mutation error:", err);
+      setFreezeError(err.message);
+    } finally {
+      setFreezeLoading(false);
+    }
   };
 
   const handleAskSarvam = async (e, customPrompt) => {
@@ -231,9 +285,16 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#020408] text-white py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    <div className="relative flex-1 flex flex-col bg-[#020408] text-white py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      {/* Background Animated Aurora Glow Mesh */}
+      <div className="aurora-mesh">
+        <div className="aurora-orb-1" />
+        <div className="aurora-orb-2" />
+        <div className="aurora-orb-3" />
+      </div>
+
       {/* Top Scenario & Case Header Bar */}
-      <div className="mb-6 liquid-glass p-5 rounded-2xl border border-white/[0.08] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="mb-6 liquid-glass-extreme laser-scan-line p-5 rounded-2xl border border-white/[0.12] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-xl font-bold font-sans text-white">{activeScenario.name}</h1>
@@ -246,8 +307,8 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Verdict Badge */}
-        <div className="flex items-center gap-4 bg-black/60 p-3 rounded-xl border border-white/[0.06]">
+        {/* Verdict Badge & Compliance Action */}
+        <div className="flex flex-wrap items-center gap-4 bg-black/60 p-3 rounded-xl border border-white/[0.06]">
           <div className="text-right">
             <div className="text-[10px] font-mono text-zinc-400 uppercase">Policy Verdict</div>
             <div
@@ -262,13 +323,39 @@ export default function DashboardPage() {
               {activeScenario.decision}
             </div>
           </div>
-          <div className="w-px h-8 bg-white/10" />
+          <div className="w-px h-8 bg-white/10 hidden sm:block" />
           <div className="text-left">
             <div className="text-[10px] font-mono text-zinc-400 uppercase">Confidence</div>
             <div className="font-mono text-sm font-bold text-[#00ff66]">
               {(activeScenario.confidence * 100).toFixed(0)}%
             </div>
           </div>
+
+          {activeScenario.decision === "FREEZE" && (
+            <>
+              <div className="w-px h-8 bg-white/10 hidden sm:block" />
+              <div>
+                {activeFreezeStatus?.status === "EXECUTED_BY_COMPLIANCE" ? (
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-400 text-xs font-mono">
+                    <CheckCircle2 className="w-4 h-4 text-[#00ff66]" />
+                    <div>
+                      <div className="font-bold">FROZEN IN FALKORDB</div>
+                      <div className="text-[9px] text-zinc-400">{activeFreezeStatus.decisionId}</div>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsFreezeModalOpen(true)}
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-red-950/50 hover:bg-red-900/60 border border-red-500/50 hover:border-red-400 text-red-200 hover:text-white text-xs font-mono font-bold transition-all shadow-[0_0_20px_rgba(239,68,68,0.25)] cursor-pointer"
+                  >
+                    <Lock className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+                    <span>Authorize Gated Freeze (HITL)</span>
+                  </button>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -297,7 +384,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Main Dynamic HTML5 Canvas Graph Visualizer (Full Width) */}
-      <div className="w-full h-[580px] rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl relative mb-6">
+      <div className="w-full h-[580px] rounded-2xl overflow-hidden border border-white/[0.12] shadow-[0_0_50px_rgba(0,0,0,0.85)] relative mb-6 z-10">
         <NetworkXGraphVisualizer
           nodes={activeScenario.nodes}
           edges={activeScenario.edges}
@@ -310,7 +397,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Centered Minimalist Sarvam AI (105B) Interactive Console */}
-      <section className="max-w-4xl mx-auto w-full liquid-glass rounded-2xl border border-white/[0.08] p-6 mb-12">
+      <section className="max-w-4xl mx-auto w-full liquid-glass-extreme rounded-2xl border border-white/[0.12] p-6 mb-12 relative z-10 shadow-[0_0_35px_rgba(0,255,102,0.06)]">
         <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-[#00ff66]/10 border border-[#00ff66]/30 flex items-center justify-center text-[#00ff66]">
@@ -409,6 +496,144 @@ export default function DashboardPage() {
           </button>
         </form>
       </section>
+
+      {/* Two-Stage Compliance HITL Authorization Modal */}
+      {isFreezeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="max-w-xl w-full liquid-glass rounded-2xl border border-red-500/40 p-6 shadow-2xl relative">
+            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-red-950/60 border border-red-500/50 flex items-center justify-center text-red-400">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white font-sans">
+                    Two-Stage Human-in-the-Loop Freeze
+                  </h3>
+                  <p className="text-[11px] font-mono text-zinc-400">
+                    Rule F4 Compliance Gating Protocol
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFreezeModalOpen(false)}
+                className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div className="p-3 rounded-xl bg-black/60 border border-white/10 text-xs font-mono">
+                <div className="flex justify-between py-1 border-b border-white/5">
+                  <span className="text-zinc-400">Target Entity:</span>
+                  <span className="text-white font-bold">{activeScenario.targetId}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-white/5">
+                  <span className="text-zinc-400">Threat Level:</span>
+                  <span className="text-red-400 font-bold">{activeScenario.threatLevel}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-white/5">
+                  <span className="text-zinc-400">Flagged Component Size:</span>
+                  <span className="text-white">{activeScenario.flaggedInComponent} Accounts</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-zinc-400">Evidence Path:</span>
+                  <span className="text-[#00ff66]">{activeScenario.evidencePath.join(" -> ")}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1">
+                  Authorizing Officer
+                </label>
+                <input
+                  type="text"
+                  value={officerName}
+                  onChange={(e) => setOfficerName(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white font-mono focus:outline-none focus:border-[#00ff66]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-zinc-400 mb-1">
+                  Compliance Justification & Audit Note
+                </label>
+                <textarea
+                  rows={3}
+                  value={officerNote}
+                  onChange={(e) => setOfficerNote(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white font-sans focus:outline-none focus:border-[#00ff66] resize-none"
+                />
+              </div>
+
+              {freezeError && (
+                <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-xs text-red-300 font-mono flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-bold">FalkorDB Mutation Notice:</div>
+                    <div className="text-[11px] text-zinc-300">{freezeError}</div>
+                  </div>
+                </div>
+              )}
+
+              {activeFreezeStatus?.status === "EXECUTED_BY_COMPLIANCE" && (
+                <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-xs text-emerald-300 font-mono flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#00ff66] shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-bold text-[#00ff66]">Account Frozen & Audit Logged:</div>
+                    <div className="text-[11px] text-zinc-300">
+                      Decision ID: {activeFreezeStatus.decisionId}
+                    </div>
+                    <div className="text-[11px] text-zinc-400">
+                      Timestamp: {activeFreezeStatus.timestamp}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setIsFreezeModalOpen(false)}
+                className="px-4 py-2 rounded-xl border border-white/10 text-xs font-mono text-zinc-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              {activeFreezeStatus?.status === "EXECUTED_BY_COMPLIANCE" ? (
+                <button
+                  type="button"
+                  onClick={() => setIsFreezeModalOpen(false)}
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-black font-mono font-bold text-xs transition-colors cursor-pointer"
+                >
+                  Done
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={freezeLoading}
+                  onClick={handleExecuteFreeze}
+                  className="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white font-mono font-bold text-xs transition-colors shadow-[0_0_20px_rgba(239,68,68,0.4)] flex items-center gap-1.5 cursor-pointer"
+                >
+                  {freezeLoading ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Writing to FalkorDB...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileCheck className="w-4 h-4" />
+                      <span>Sign & Execute Freeze in FalkorDB</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

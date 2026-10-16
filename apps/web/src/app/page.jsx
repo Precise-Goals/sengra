@@ -23,11 +23,15 @@ export const metadata = {
 export default function HomePage() {
   return (
     <div className="relative min-h-screen bg-[#020408] text-white overflow-hidden">
-      {/* Background Radial Glow Effect */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-[#00ff66]/10 to-transparent blur-[140px] pointer-events-none" />
+      {/* Background Animated Aurora Glow Mesh */}
+      <div className="aurora-mesh">
+        <div className="aurora-orb-1" />
+        <div className="aurora-orb-2" />
+        <div className="aurora-orb-3" />
+      </div>
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+      <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center z-10">
         {/* Status Pill */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full liquid-glass border border-[#00ff66]/30 mb-8">
           <span className="w-2 h-2 rounded-full bg-[#00ff66] animate-pulse" />
@@ -56,7 +60,7 @@ export default function HomePage() {
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <Link
             href="/dashboard"
-            className="px-6 py-3 rounded-xl neon-button text-sm font-mono flex items-center gap-2"
+            className="px-6 py-3 rounded-xl neon-button text-sm font-mono flex items-center gap-2 shadow-[0_0_25px_rgba(0,255,102,0.3)]"
           >
             <span>Launch Forensic Dashboard</span>
             <ArrowRight className="w-4 h-4" />
@@ -69,15 +73,16 @@ export default function HomePage() {
           </Link>
           <Link
             href="/docs"
-            className="px-6 py-3 rounded-xl liquid-glass border border-white/10 hover:border-white/20 text-sm font-mono text-zinc-400 hover:text-zinc-200 transition-all"
+            className="px-6 py-3 rounded-xl liquid-glass border border-white/10 hover:border-white/20 text-sm font-mono text-zinc-400 hover:text-zinc-200 transition-all flex items-center gap-2"
           >
-            <span>Architecture Docs</span>
+            <Cpu className="w-4 h-4 text-[#00ff66]" />
+            <span>Architecture & MCP Docs</span>
           </Link>
         </div>
 
         {/* Live Metrics Row */}
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-          <div className="liquid-glass p-5 rounded-2xl text-left border border-white/[0.08]">
+          <div className="liquid-glass-extreme laser-scan-line p-5 rounded-2xl text-left border border-white/[0.08]">
             <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1">
               Precision Score
             </div>
@@ -86,7 +91,7 @@ export default function HomePage() {
               +45.5% vs Flat-Table Rules
             </div>
           </div>
-          <div className="liquid-glass p-5 rounded-2xl text-left border border-white/[0.08]">
+          <div className="liquid-glass-extreme laser-scan-line p-5 rounded-2xl text-left border border-white/[0.08]">
             <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1">
               False Positive Rate
             </div>
@@ -95,7 +100,7 @@ export default function HomePage() {
               Skeptic Cleared Family Cluster
             </div>
           </div>
-          <div className="liquid-glass p-5 rounded-2xl text-left border border-white/[0.08]">
+          <div className="liquid-glass-extreme laser-scan-line p-5 rounded-2xl text-left border border-white/[0.08]">
             <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1">
               Memory Recall SLA
             </div>
@@ -104,7 +109,7 @@ export default function HomePage() {
               Sub-5ms Associative Citation
             </div>
           </div>
-          <div className="liquid-glass p-5 rounded-2xl text-left border border-white/[0.08]">
+          <div className="liquid-glass-extreme laser-scan-line p-5 rounded-2xl text-left border border-white/[0.08]">
             <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1">
               Planted Entities
             </div>

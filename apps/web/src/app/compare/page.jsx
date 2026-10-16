@@ -147,60 +147,36 @@ export default function ComparePage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Top Navigation */}
-      <header className="h-16 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur px-6 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold">
-            S
+      {/* Page Title & Status Banner */}
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-8 pb-2">
+        <div className="liquid-glass-extreme p-5 rounded-2xl border border-white/[0.08] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-black border border-[#00ff66]/40 flex items-center justify-center text-[#00ff66] font-bold shadow-[0_0_15px_rgba(0,255,102,0.2)]">
+              <BarChart3 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-bold font-sans text-white">
+                  Quantitative Benchmark Comparison
+                </h1>
+                <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-semibold bg-[#00ff66]/15 text-[#00ff66] border border-[#00ff66]/30">
+                  SENGRA vs Flat-Table
+                </span>
+              </div>
+              <p className="text-xs text-zinc-400 font-sans mt-0.5">
+                Side-by-side evaluation across 22 benchmark accounts: proving graph topology superiority (+45.5% precision delta).
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-sm font-semibold tracking-wide text-zinc-100 flex items-center gap-2">
-              SENGRA <span className="text-zinc-500">/</span> BENCHMARK COMPARISON
-            </h1>
-            <p className="text-xs text-zinc-400">
-              Graph-Native Multi-Hop Intelligence vs Legacy Single-Table Baseline
-            </p>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-4">
-          <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            BENCHMARK READY
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1.5 rounded-xl bg-black/60 border border-white/[0.08] text-xs font-mono text-[#00ff66] flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#00ff66] animate-pulse" />
+              <span>Gate G3 &gt; 25% Margin Pass</span>
+            </div>
           </div>
-          <Link
-            href="/about"
-            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors"
-          >
-            The Problem
-          </Link>
-          <Link
-            href="/docs"
-            className="px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-mono transition-colors"
-          >
-            Solution Docs
-          </Link>
-          <Link
-            href="/security"
-            className="px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs font-mono transition-colors"
-          >
-            Security Ops &rarr;
-          </Link>
-          <Link
-            href="/memory"
-            className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-colors"
-          >
-            Memory &rarr;
-          </Link>
-          <Link
-            href="/dashboard"
-            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors flex items-center gap-1.5"
-          >
-            Dashboard
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
         </div>
-      </header>
+      </div>
 
       {/* Main Content Area */}
       <main className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">

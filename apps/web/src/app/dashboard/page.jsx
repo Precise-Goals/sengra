@@ -23,7 +23,7 @@ import {
 const DEMO_SCENARIOS = {
   ringA: {
     id: "ringA",
-    name: "Ring A · Mule Collector Syndicate",
+    name: "Ring A · Mule Syndicate",
     threatLevel: "CRITICAL",
     threatBadgeColor: "text-red-400 border-red-500/40 bg-red-950/30",
     description: "8-account syndicate laundering stolen funds through collector mule with direct link to fraud rig D-17.",
@@ -57,7 +57,7 @@ const DEMO_SCENARIOS = {
   },
   ringB: {
     id: "ringB",
-    name: "Ring B · Benign Family Cluster",
+    name: "Ring B · Family Cluster",
     threatLevel: "CLEARED",
     threatBadgeColor: "text-emerald-400 border-emerald-500/40 bg-emerald-950/30",
     description: "5 household accounts sharing residential address and home Wi-Fi; zero bad devices or circularity.",
@@ -88,7 +88,7 @@ const DEMO_SCENARIOS = {
   },
   ringC: {
     id: "ringC",
-    name: "Ring C · Smurfing AML Structuring",
+    name: "Ring C · AML Smurfing",
     threatLevel: "AML ALERT",
     threatBadgeColor: "text-amber-400 border-amber-500/40 bg-amber-950/30",
     description: "4 feeder accounts structuring micro-payments below $10,000 threshold into a single funnel.",
@@ -119,7 +119,7 @@ const DEMO_SCENARIOS = {
   },
   ringD: {
     id: "ringD",
-    name: "Ring D · Infrastructure Breach Takeover",
+    name: "Ring D · Breach Bridge",
     threatLevel: "P0 CRITICAL",
     threatBadgeColor: "text-purple-400 border-purple-500/40 bg-purple-950/30",
     description: "CVE-2024-3094 SSH backdoor exploited to compromise authentication portal and hijack accounts.",
@@ -360,7 +360,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Scenario Selector Tabs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {Object.entries(DEMO_SCENARIOS).map(([key, item]) => {
           const isActive = activeKey === key;
           return (
@@ -370,13 +370,20 @@ export default function DashboardPage() {
               onClick={() => handleSelectScenario(key)}
               className={`p-3 rounded-xl border text-left transition-all ${
                 isActive
-                  ? "border-[#00ff66]/50 bg-[#00ff66]/10 text-white shadow-[0_0_15px_rgba(0,255,102,0.15)]"
-                  : "border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:text-white hover:border-white/20"
+                  ? "border-[#00ff66]/60 bg-[#00ff66]/10 text-white shadow-[0_0_15px_rgba(0,255,102,0.15)]"
+                  : "border-white/[0.08] bg-white/[0.02] text-zinc-400 hover:text-white hover:border-white/20"
               }`}
             >
-              <div className="text-xs font-semibold truncate">{item.name}</div>
-              <div className="text-[10px] font-mono text-zinc-400 mt-0.5">
-                Target: {item.targetId}
+              <div className="flex items-center justify-between gap-1 mb-1">
+                <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border ${item.threatBadgeColor}`}>
+                  {item.threatLevel}
+                </span>
+                <span className="text-[10px] font-mono text-zinc-400">
+                  {item.targetId}
+                </span>
+              </div>
+              <div className="text-xs font-semibold text-white truncate">
+                {item.name}
               </div>
             </button>
           );

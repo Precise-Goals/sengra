@@ -283,55 +283,36 @@ export default function DocsPage() {
         <div className="aurora-orb-3" />
       </div>
 
-      {/* Top Header */}
-      <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-bold shadow-[0_0_12px_rgba(34,211,238,0.25)]">
-            <BookOpen className="w-4 h-4" />
+      {/* Page Title & Status Banner */}
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+        <div className="liquid-glass-extreme p-5 rounded-2xl border border-white/[0.08] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-black border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-bold shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-bold font-sans text-white">
+                  Technical Architecture &amp; System Specification
+                </h1>
+                <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-semibold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+                  Full System Docs
+                </span>
+              </div>
+              <p className="text-xs text-zinc-400 font-sans mt-0.5">
+                Complete engineering guide: FalkorDB Graph Schema, 15 MCP Tools, Rule F4 Policy Engine, and Sarvam AI 105B integration.
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-wide text-zinc-100 flex items-center gap-2 font-mono">
-              SENGRA <span className="text-zinc-600">{"//"}</span> TECHNICAL DOCUMENTATION
-            </h1>
-            <p className="text-xs text-zinc-400">
-              Complete Specification: Graph Schema, 15 MCP Tools, Rule F4, and Sarvam AI 105B
-            </p>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/about"
-            className="px-3 py-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors"
-          >
-            &larr; The Problem / About Us
-          </Link>
-          <Link
-            href="/"
-            className="px-3 py-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors"
-          >
-            Ops Console
-          </Link>
-          <Link
-            href="/compare"
-            className="px-3 py-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors"
-          >
-            Benchmark View
-          </Link>
-          <Link
-            href="/memory"
-            className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-colors"
-          >
-            Memory
-          </Link>
-          <Link
-            href="/security"
-            className="px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs font-mono transition-colors"
-          >
-            Security Ops
-          </Link>
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1.5 rounded-xl bg-black/60 border border-white/[0.08] text-xs font-mono text-cyan-400 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span>15 MCP Tools Verified</span>
+            </div>
+          </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content Layout with Sticky Sidebar */}
       <div className="flex flex-1 max-w-7xl mx-auto w-full">

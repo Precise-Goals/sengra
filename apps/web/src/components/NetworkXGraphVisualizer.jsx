@@ -657,7 +657,7 @@ export default function NetworkXGraphVisualizer({
       if (nodeCount === 0) return targetMap;
 
       const centerX = width / 2;
-      const centerY = height / 2;
+      const centerY = height / 2 + 15; // slightly offset downwards to avoid top HUD
 
       if (activeLayout === "kahn-dag") {
         // 4-Tier Kahn DAG Layout: Upstream -> Adapters -> Workflows -> Downstream
@@ -669,8 +669,8 @@ export default function NetworkXGraphVisualizer({
           tierBuckets[t].push(n.id);
         });
 
-        const leftMargin = width * 0.14;
-        const rightMargin = width * 0.86;
+        const leftMargin = width * 0.16;
+        const rightMargin = width * 0.84;
         const colSpacing = (rightMargin - leftMargin) / 3;
 
         for (let t = 0; t < 4; t++) {
@@ -679,12 +679,12 @@ export default function NetworkXGraphVisualizer({
           const count = idsInTier.length;
 
           idsInTier.forEach((nodeId, idx) => {
-            const verticalPadding = height * 0.16;
+            const verticalPadding = height * 0.22;
             const availableHeight = height - verticalPadding * 2;
             const y =
               count === 1
                 ? centerY
-                : verticalPadding + (availableHeight * (idx + 0.5)) / count;
+                : verticalPadding + (availableHeight * (idx + 0.5)) / count + 10;
             targetMap.set(nodeId, { x, y });
           });
         }
@@ -708,7 +708,7 @@ export default function NetworkXGraphVisualizer({
         });
 
         // Ring radii (tightened concentric clusters)
-        const ringRadii = { 1: 95, 2: 175, 3: 250 };
+        const ringRadii = { 1: 85, 2: 155, 3: 215 };
 
         for (let ring = 1; ring <= 3; ring++) {
           const idsInRing = hopBuckets[ring];
@@ -730,6 +730,44 @@ export default function NetworkXGraphVisualizer({
     },
     [activeLayout, parsedNodes, parsedEdges, activeEpicenterId]
   );
+
+  // Reset / Fit-to-screen camera handler with bounding box auto-scaling
+  const handleResetCamera = useCallback(() => {
+    const sim = simRef.current;
+    if (!sim || !sim.nodes || sim.nodes.length === 0) {
+      if (sim) sim.camera = { x: 0, y: 0, k: 1.0 };
+      return;
+    }
+
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+
+    sim.nodes.forEach((n) => {
+      minX = Math.min(minX, n.x - n.radius - 20);
+      maxX = Math.max(maxX, n.x + n.radius + 20);
+      minY = Math.min(minY, n.y - n.radius - 20);
+      maxY = Math.max(maxY, n.y + n.radius + 40); // account for text labels
+    });
+
+    const bboxW = Math.max(maxX - minX, 100);
+    const bboxH = Math.max(maxY - minY, 100);
+    const paddingX = 75;
+    const paddingTop = 85; // leave room for top HUD toolbar
+    const paddingBottom = 55;
+
+    const availW = Math.max(sim.width - paddingX * 2, 150);
+    const availH = Math.max(sim.height - (paddingTop + paddingBottom), 150);
+
+    const scale = Math.min(1.2, Math.max(0.45, Math.min(availW / bboxW, availH / bboxH)));
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+
+    sim.camera.k = scale;
+    sim.camera.x = sim.width / 2 - centerX * scale;
+    sim.camera.y = (sim.height + (paddingTop - paddingBottom) * 0.5) / 2 - centerY * scale;
+  }, []);
 
   // Initialize or re-sync physics simulation nodes and edges
   useEffect(() => {
@@ -807,13 +845,15 @@ export default function NetworkXGraphVisualizer({
     sim.particles = newParticles;
     sim.nodeMap = nodeMap;
     sim.layoutTargetMap = computeLayoutTargets(width, height);
-  }, [parsedNodes, parsedEdges, computeLayoutTargets]);
+    handleResetCamera();
+  }, [parsedNodes, parsedEdges, computeLayoutTargets, handleResetCamera]);
 
   // Update layout targets whenever layout mode or size changes
   useEffect(() => {
     const sim = simRef.current;
     sim.layoutTargetMap = computeLayoutTargets(sim.width, sim.height);
-  }, [activeLayout, computeLayoutTargets]);
+    handleResetCamera();
+  }, [activeLayout, computeLayoutTargets, handleResetCamera]);
 
   // ============================================================================
   // PHYSICS SIMULATION ENGINE & ANIMATION LOOP
@@ -921,18 +961,27 @@ export default function NetworkXGraphVisualizer({
           nodes.forEach((node) => {
             if (node.isDragging) return;
 
-            // Weak restorative pull toward canvas center
+            // Restorative pull toward canvas center (offset below top HUD)
             const gdx = centerX - node.x;
-            const gdy = centerY - node.y;
-            node.vx += gdx * centerGravityK * 0.08;
-            node.vy += gdy * centerGravityK * 0.08;
+            const gdy = centerY + 15 - node.y;
+            node.vx += gdx * centerGravityK * 0.1;
+            node.vy += gdy * centerGravityK * 0.1;
+
+            // Soft boundary repulsion to keep nodes inside visible canvas area
+            const marginX = 80;
+            const marginYTop = 95;
+            const marginYBottom = 60;
+            if (node.x < marginX) node.vx += (marginX - node.x) * 0.12;
+            if (node.x > width - marginX) node.vx += (width - marginX - node.x) * 0.12;
+            if (node.y < marginYTop) node.vy += (marginYTop - node.y) * 0.12;
+            if (node.y > height - marginYBottom) node.vy += (height - marginYBottom - node.y) * 0.12;
 
             // Velocity damping factor: exactly 0.82
             node.vx *= 0.82;
             node.vy *= 0.82;
 
             // Cap maximum displacement to prevent numerical instability
-            const maxDisplacement = 18;
+            const maxDisplacement = 16;
             const speed = Math.sqrt(node.vx * node.vx + node.vy * node.vy);
             if (speed > maxDisplacement) {
               node.vx = (node.vx / speed) * maxDisplacement;
@@ -1523,12 +1572,6 @@ export default function NetworkXGraphVisualizer({
       const selectedNode = nodeId ? simRef.current.nodeMap.get(nodeId) : null;
       onNodeClick(selectedNode);
     }
-  };
-
-  // Reset / Fit-to-screen camera handler
-  const handleResetCamera = () => {
-    const sim = simRef.current;
-    sim.camera = { x: 0, y: 0, k: 1.0 };
   };
 
   // Export Canvas snapshot as PNG

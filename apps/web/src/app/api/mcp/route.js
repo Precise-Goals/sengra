@@ -6,6 +6,8 @@
 import { NextResponse } from "next/server";
 import { TOOL_CATALOG, executeTool } from "@sengra/tools";
 
+export const maxDuration = 30;
+
 export async function GET() {
   return NextResponse.json({
     name: "sengra-mcp-server",

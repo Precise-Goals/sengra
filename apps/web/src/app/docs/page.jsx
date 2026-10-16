@@ -284,7 +284,7 @@ export default function DocsPage() {
           </div>
           <div>
             <h1 className="text-sm font-bold tracking-wide text-zinc-100 flex items-center gap-2 font-mono">
-              SENGRA <span className="text-zinc-600">//</span> TECHNICAL DOCUMENTATION
+              SENGRA <span className="text-zinc-600">{"//"}</span> TECHNICAL DOCUMENTATION
             </h1>
             <p className="text-xs text-zinc-400">
               Complete Specification: Graph Schema, 15 MCP Tools, Rule F4, and Sarvam AI 105B

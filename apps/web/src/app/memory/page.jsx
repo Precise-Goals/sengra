@@ -121,6 +121,18 @@ export default function MemoryPage() {
             MEMORY ACTIVE (5 CASES)
           </div>
           <Link
+            href="/about"
+            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors"
+          >
+            The Problem
+          </Link>
+          <Link
+            href="/docs"
+            className="px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-mono transition-colors"
+          >
+            Solution Docs
+          </Link>
+          <Link
             href="/compare"
             className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors"
           >
@@ -133,10 +145,10 @@ export default function MemoryPage() {
             Security Ops
           </Link>
           <Link
-            href="/"
+            href="/dashboard"
             className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors flex items-center gap-1.5"
           >
-            Investigation Console
+            Dashboard
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

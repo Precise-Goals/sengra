@@ -1680,7 +1680,7 @@ export default function NetworkXGraphVisualizer({
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#00ff66] shadow-[0_0_8px_#00ff66]" />
             <span className="text-zinc-500">FPS:</span>
-            <span className="text-[#00ff66] font-bold">{fps}</span>
+            <span ref={fpsSpanRef} className="text-[#00ff66] font-bold">60</span>
           </div>
 
           <div className="flex items-center gap-1">
@@ -1696,7 +1696,7 @@ export default function NetworkXGraphVisualizer({
           <div className="flex items-center gap-1">
             <span className="text-zinc-500">THROUGHPUT:</span>
             <span className="text-[#00ff66]">
-              {particlesEnabled ? `${activePacketsCount * 8} pkts/s` : "IDLE"}
+              {particlesEnabled ? `${estimatedPacketsCount * 8} pkts/s` : "IDLE"}
             </span>
           </div>
 

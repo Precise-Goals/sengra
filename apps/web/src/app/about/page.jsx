@@ -71,7 +71,7 @@ export default function AboutProblemPage() {
             </div>
             <h3 className="text-lg font-bold text-white mb-2">3. The 50% False Positive Disaster</h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Heuristics that flag "shared address + shared IP" fail catastrophically on innocent family clusters. Legitimate households are frozen, generating high customer support churn and reputation damage.
+              Heuristics that flag &quot;shared address + shared IP&quot; fail catastrophically on innocent family clusters. Legitimate households are frozen, generating high customer support churn and reputation damage.
             </p>
           </div>
 
@@ -93,7 +93,7 @@ export default function AboutProblemPage() {
             </div>
             <h3 className="text-lg font-bold text-white mb-2">5. Cyber & Fraud Disconnection</h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Security Operations Centers (SOC) and Fraud Teams operate in silos. When an infrastructure zero-day (like CVE-2024-3094) leaks credentials, fraud systems don't correlate the breach until millions are stolen.
+              Security Operations Centers (SOC) and Fraud Teams operate in silos. When an infrastructure zero-day (like CVE-2024-3094) leaks credentials, fraud systems don&apos;t correlate the breach until millions are stolen.
             </p>
           </div>
 

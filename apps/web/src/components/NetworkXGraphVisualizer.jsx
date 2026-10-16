@@ -545,26 +545,29 @@ export default function NetworkXGraphVisualizer({
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
   const animFrameIdRef = useRef(null);
+  const fpsSpanRef = useRef(null);
 
-  // Layout mode state
-  const [activeLayout, setActiveLayout] = useState(propLayout);
+  // Layout mode state with standard React prop sync
+  const [internalLayout, setInternalLayout] = useState(propLayout);
+  const [prevPropLayout, setPrevPropLayout] = useState(propLayout);
+  if (propLayout !== prevPropLayout) {
+    setPrevPropLayout(propLayout);
+    setInternalLayout(propLayout);
+  }
+  const activeLayout = internalLayout;
+  const setActiveLayout = setInternalLayout;
+
+  // Selected node state with standard React prop sync
+  const [internalSelectedId, setInternalSelectedId] = useState(controlledSelectedId ?? null);
+  const [prevControlledSelectedId, setPrevControlledSelectedId] = useState(controlledSelectedId);
+  if (controlledSelectedId !== prevControlledSelectedId) {
+    setPrevControlledSelectedId(controlledSelectedId);
+    setInternalSelectedId(controlledSelectedId ?? null);
+  }
+
   const [isPhysicsRunning, setIsPhysicsRunning] = useState(true);
   const [particlesEnabled, setParticlesEnabled] = useState(showParticles);
-  const [internalSelectedId, setInternalSelectedId] = useState(controlledSelectedId);
   const [hoveredNodeId, setHoveredNodeId] = useState(null);
-  const [fps, setFps] = useState(60);
-  const [activePacketsCount, setActivePacketsCount] = useState(0);
-
-  // Sync external props
-  useEffect(() => {
-    if (propLayout) setActiveLayout(propLayout);
-  }, [propLayout]);
-
-  useEffect(() => {
-    if (controlledSelectedId !== undefined) {
-      setInternalSelectedId(controlledSelectedId);
-    }
-  }, [controlledSelectedId]);
 
   // Normalize graph data from props or Cytoscape elements
   const { parsedNodes, parsedEdges } = useMemo(() => {
@@ -612,6 +615,14 @@ export default function NetworkXGraphVisualizer({
     };
   }, [propNodes, propEdges, propElements]);
 
+  // Derived estimated packet throughput
+  const estimatedPacketsCount = useMemo(() => {
+    return parsedEdges.reduce((acc, e) => {
+      const packetCount = Math.max(1, Math.min(4, Math.floor((e.throughput || 50) / 35)));
+      return acc + packetCount;
+    }, 0);
+  }, [parsedEdges]);
+
   // Active epicenter node
   const activeEpicenterId = useMemo(() => {
     if (propEpicenterId) return propEpicenterId;
@@ -620,7 +631,7 @@ export default function NetworkXGraphVisualizer({
     return bad ? bad.id : parsedNodes[0]?.id;
   }, [propEpicenterId, internalSelectedId, parsedNodes]);
 
-  // Simulation physics mutable storage in ref to avoid re-renders on every tick
+  // Simulation physics mutable storage in ref (pure initialization without side effects)
   const simRef = useRef({
     nodes: [],
     edges: [],
@@ -632,9 +643,9 @@ export default function NetworkXGraphVisualizer({
     height: 600,
     dpr: 1,
     shockwaveRadius: 0,
-    lastFrameTime: performance.now(),
+    lastFrameTime: 0,
     frameCount: 0,
-    fpsTimer: performance.now(),
+    fpsTimer: 0,
     layoutTargetMap: new Map(), // nodeId -> { targetX, targetY }
   });
 
@@ -796,7 +807,6 @@ export default function NetworkXGraphVisualizer({
     sim.particles = newParticles;
     sim.nodeMap = nodeMap;
     sim.layoutTargetMap = computeLayoutTargets(width, height);
-    setActivePacketsCount(newParticles.length);
   }, [parsedNodes, parsedEdges, computeLayoutTargets]);
 
   // Update layout targets whenever layout mode or size changes
@@ -824,12 +834,17 @@ export default function NetworkXGraphVisualizer({
       const { width, height, dpr, nodes, edges, particles, camera } = sim;
 
       // Calculate frame rate
+      if (sim.fpsTimer === 0) {
+        sim.fpsTimer = timestamp;
+      }
       sim.frameCount++;
       if (timestamp - sim.fpsTimer >= 500) {
         const measuredFps = Math.round(
           (sim.frameCount * 1000) / (timestamp - sim.fpsTimer)
         );
-        setFps(measuredFps);
+        if (fpsSpanRef.current) {
+          fpsSpanRef.current.textContent = String(measuredFps);
+        }
         sim.frameCount = 0;
         sim.fpsTimer = timestamp;
       }

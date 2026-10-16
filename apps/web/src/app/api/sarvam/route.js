@@ -161,6 +161,8 @@ export async function POST(req) {
       success: true,
       model: `${model} (fallback)`,
       fallback: true,
+      answer: fallbackText,
+      content: fallbackText,
       message: {
         role: "assistant",
         content: fallbackText,
@@ -206,6 +208,8 @@ export async function POST(req) {
         success: true,
         model: `${model} (fallback)`,
         fallback: true,
+        answer: fallbackText,
+        content: fallbackText,
         error: `Upstream error ${upstreamResponse.status}: ${errorText}`,
         message: {
           role: "assistant",
@@ -237,6 +241,8 @@ export async function POST(req) {
       success: true,
       id: jsonResult.id,
       model: jsonResult.model || model,
+      answer: assistantMessage.content,
+      content: assistantMessage.content,
       message: assistantMessage,
       usage: jsonResult.usage,
       raw: jsonResult,
@@ -254,6 +260,8 @@ export async function POST(req) {
       success: true,
       model: `${model} (fallback)`,
       fallback: true,
+      answer: fallbackText,
+      content: fallbackText,
       error: err.message,
       message: {
         role: "assistant",

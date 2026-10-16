@@ -1,404 +1,316 @@
-"use client";
-
-import React, { useState } from "react";
 import Link from "next/link";
 import {
-  GraphCanvas,
-  toCytoscapeElements,
-  CaseCard,
-  TracePanel,
-  MetricsBar,
-} from "@sengra/ui";
+  ShieldAlert,
+  ShieldCheck,
+  Network,
+  Cpu,
+  Layers,
+  Sparkles,
+  ArrowRight,
+  Database,
+  Lock,
+  Terminal,
+  Activity,
+  CheckCircle2,
+} from "lucide-react";
 
-const DEMO_SCENARIOS = {
-  ringA: {
-    name: "Ring A: Mule Collector Ring",
-    badge: "CRITICAL THREAT",
-    badgeColor: "bg-red-500/20 text-red-400 border-red-500/30",
-    description: "8 accounts sharing 2 devices, including confirmed fraud device D-17.",
-    targetId: "A-RINGA-1",
-    flaggedInComponent: 8,
-    hopsToBadDevice: 1,
-    badDevices: ["D-17"],
-    nodes: [
-      { id: "A-RINGA-1", label: "Account", name: "Victim Mule 1" },
-      { id: "A-RINGA-2", label: "Account", name: "Recruiter Mule" },
-      { id: "A-RINGA-COLLECTOR", label: "Account", name: "Collector Mule" },
-      { id: "D-17", label: "Device", name: "D-17 (Fraud Rig)", known_bad: true },
-      { id: "D-18", label: "Device", name: "D-18 (Mobile)" },
-      { id: "IP-MALICIOUS", label: "IPAddress", name: "198.51.100.42" },
-    ],
-    edges: [
-      { source: "A-RINGA-1", target: "D-17", type: "USED" },
-      { source: "A-RINGA-2", target: "D-17", type: "USED" },
-      { source: "A-RINGA-COLLECTOR", target: "D-18", type: "USED" },
-      { source: "A-RINGA-2", target: "D-18", type: "USED" },
-      { source: "D-17", target: "IP-MALICIOUS", type: "CONNECTED_TO" },
-      { source: "A-RINGA-1", target: "A-RINGA-COLLECTOR", type: "TRANSFERRED_TO" },
-      { source: "A-RINGA-2", target: "A-RINGA-COLLECTOR", type: "TRANSFERRED_TO" },
-    ],
-  },
-  ringB: {
-    name: "Ring B: Benign Family Cluster",
-    badge: "BENIGN CANDIDATE",
-    badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-    description: "5 accounts sharing residential address and home Wi-Fi; zero bad devices.",
-    targetId: "A-RINGB-1",
-    flaggedInComponent: 1,
-    hopsToBadDevice: Infinity,
-    badDevices: [],
-    hasSharedAddress: true,
-    hasSharedIp: true,
-    hasCircularPayments: false,
-    nodes: [
-      { id: "A-RINGB-1", label: "Account", name: "Parent (Alice)" },
-      { id: "A-RINGB-2", label: "Account", name: "Parent (Bob)" },
-      { id: "A-RINGB-3", label: "Account", name: "Child (Charlie)" },
-      { id: "ADDR-B-HOME", label: "Address", name: "742 Evergreen Terrace" },
-      { id: "IP-HOME-WIFI", label: "IPAddress", name: "192.168.1.1 (Home)" },
-    ],
-    edges: [
-      { source: "A-RINGB-1", target: "ADDR-B-HOME", type: "HAS_ADDRESS" },
-      { source: "A-RINGB-2", target: "ADDR-B-HOME", type: "HAS_ADDRESS" },
-      { source: "A-RINGB-3", target: "ADDR-B-HOME", type: "HAS_ADDRESS" },
-      { source: "A-RINGB-1", target: "IP-HOME-WIFI", type: "CONNECTED_TO" },
-      { source: "A-RINGB-2", target: "IP-HOME-WIFI", type: "CONNECTED_TO" },
-      { source: "A-RINGB-3", target: "IP-HOME-WIFI", type: "CONNECTED_TO" },
-    ],
-  },
-  ringC: {
-    name: "Ring C: Account Takeover Chain",
-    badge: "SUSPICIOUS ACCESS",
-    badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    description: "Sudden login from high-risk IP with credential stuffing pattern.",
-    targetId: "A-RINGC-1",
-    flaggedInComponent: 2,
-    hopsToBadDevice: 3,
-    badDevices: [],
-    nodes: [
-      { id: "A-RINGC-1", label: "Account", name: "Compromised Account" },
-      { id: "DEV-NEW", label: "Device", name: "Unrecognized Device" },
-      { id: "IP-VPN", label: "IPAddress", name: "VPN Exit Node" },
-      { id: "CARD-ATO", label: "Card", name: "New Card Added" },
-    ],
-    edges: [
-      { source: "A-RINGC-1", target: "DEV-NEW", type: "USED" },
-      { source: "DEV-NEW", target: "IP-VPN", type: "CONNECTED_TO" },
-      { source: "A-RINGC-1", target: "CARD-ATO", type: "ADDED_PAYMENT" },
-    ],
-  },
+export const metadata = {
+  title: "SENGRA — Graph-Native Financial Crime Intelligence",
+  description:
+    "Autonomous graph-native fraud investigation agent powered by FalkorDB Cloud, Sarvam AI 105B, and Cytoscape/NetworkX physics.",
 };
 
-export default function DarkOpsConsole() {
-  const [activeScenarioKey, setActiveScenarioKey] = useState("ringA");
-  const [layoutName, setLayoutName] = useState("concentric");
-  const [selectedNode, setSelectedNode] = useState(null);
-  const [isInvestigating, setIsInvestigating] = useState(false);
-  const [investigationResult, setInvestigationResult] = useState(null);
-  const [highlightedNodeIds, setHighlightedNodeIds] = useState([]);
-  const [animatingPath, setAnimatingPath] = useState(null);
-  const [activeSubtitle, setActiveSubtitle] = useState(null);
-
-  const currentScenario = DEMO_SCENARIOS[activeScenarioKey];
-  const cytoscapeElements = toCytoscapeElements(currentScenario.nodes, currentScenario.edges);
-
-  async function handleRunInvestigation() {
-    setIsInvestigating(true);
-    setInvestigationResult(null);
-    setAnimatingPath(null);
-    setActiveSubtitle(null);
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          accountId: currentScenario.targetId,
-          context: {
-            flaggedInComponent: currentScenario.flaggedInComponent,
-            hopsToBadDevice: currentScenario.hopsToBadDevice,
-            badDevices: currentScenario.badDevices,
-            hasSharedAddress: currentScenario.hasSharedAddress,
-            hasSharedIp: currentScenario.hasSharedIp,
-            hasCircularPayments: currentScenario.hasCircularPayments,
-            subgraph: {
-              nodes: currentScenario.nodes,
-              edges: currentScenario.edges,
-            },
-          },
-        }),
-      });
-
-      const res = await response.json();
-      if (res.success && res.data) {
-        setInvestigationResult(res.data);
-        if (res.data.evidencePath && res.data.evidencePath.length > 0) {
-          setHighlightedNodeIds(res.data.evidencePath);
-          // Trigger animated path traversal
-          setAnimatingPath([...res.data.evidencePath]);
-        }
-      }
-    } catch (err) {
-      console.error("Investigation failed:", err);
-    } finally {
-      setIsInvestigating(false);
-    }
-  }
-
-  function handleReplayAnimation() {
-    if (investigationResult?.evidencePath && investigationResult.evidencePath.length > 0) {
-      setAnimatingPath(null);
-      setTimeout(() => {
-        setAnimatingPath([...investigationResult.evidencePath]);
-      }, 50);
-    }
-  }
-
-  function handleSelectScenario(key) {
-    setActiveScenarioKey(key);
-    setSelectedNode(null);
-    setInvestigationResult(null);
-    setHighlightedNodeIds([]);
-    setAnimatingPath(null);
-    setActiveSubtitle(null);
-  }
-
+export default function HomePage() {
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#09090b] text-zinc-100 font-sans overflow-hidden select-none">
-      {/* Top Header */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur">
-        <div className="flex items-center gap-3">
-          <div className="h-3 w-3 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]" />
-          <h1 className="text-sm font-bold tracking-widest text-zinc-100 font-mono">
-            SENGRA <span className="text-zinc-500">//</span> GRAPH FRAUD INTELLIGENCE
-          </h1>
-          <span className="text-xs px-2 py-0.5 rounded border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 font-mono">
-            SPRINT 3 OPS CONSOLE
+    <div className="relative min-h-screen bg-[#020408] text-white overflow-hidden">
+      {/* Background Radial Glow Effect */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-[#00ff66]/10 to-transparent blur-[140px] pointer-events-none" />
+
+      {/* Hero Section */}
+      <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+        {/* Status Pill */}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full liquid-glass border border-[#00ff66]/30 mb-8">
+          <span className="w-2 h-2 rounded-full bg-[#00ff66] animate-pulse" />
+          <span className="text-xs font-mono text-zinc-300">
+            Powered by <strong className="text-[#00ff66]">Sarvam AI (105B)</strong> & <strong className="text-white">FalkorDB Cloud</strong>
           </span>
         </div>
 
-        <div className="flex items-center gap-6 text-xs font-mono text-zinc-400">
-          <div className="flex items-center gap-2">
-            <span className="text-zinc-500">DB:</span>
-            <span className="text-emerald-400">FalkorDB TLS (Active)</span>
+        {/* Headline */}
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight font-sans max-w-5xl mx-auto leading-tight sm:leading-none">
+          Autonomous Graph-Native <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-[#00ff66] neon-text-glow">
+            Financial Crime Intelligence
+          </span>
+        </h1>
+
+        {/* Subtitle */}
+        <p className="mt-6 text-lg sm:text-xl text-zinc-400 max-w-3xl mx-auto font-sans leading-relaxed">
+          Traditional tabular rules fail on multi-hop syndicates and lock innocent customers.
+          SENGRA combines <span className="text-white font-medium">graph topology</span>,{" "}
+          <span className="text-white font-medium">in-memory Graphology algorithms</span>, and{" "}
+          <span className="text-[#00ff66] font-medium">Sarvam 105B agentic reasoning</span> to unmask fraud rings with 100% precision.
+        </p>
+
+        {/* Primary CTAs */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            href="/dashboard"
+            className="px-6 py-3 rounded-xl neon-button text-sm font-mono flex items-center gap-2"
+          >
+            <span>Launch Forensic Dashboard</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
+            href="/about"
+            className="px-6 py-3 rounded-xl liquid-glass border border-white/10 hover:border-[#00ff66]/40 text-sm font-mono text-zinc-200 hover:text-white transition-all flex items-center gap-2"
+          >
+            <span>The $3.1T Problem</span>
+          </Link>
+          <Link
+            href="/docs"
+            className="px-6 py-3 rounded-xl liquid-glass border border-white/10 hover:border-white/20 text-sm font-mono text-zinc-400 hover:text-zinc-200 transition-all"
+          >
+            <span>Architecture Docs</span>
+          </Link>
+        </div>
+
+        {/* Live Metrics Row */}
+        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          <div className="liquid-glass p-5 rounded-2xl text-left border border-white/[0.08]">
+            <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1">
+              Precision Score
+            </div>
+            <div className="text-3xl font-extrabold text-[#00ff66] font-mono">100.0%</div>
+            <div className="text-[11px] text-zinc-400 mt-1 font-mono">
+              +45.5% vs Flat-Table Rules
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-zinc-500">ENGINE:</span>
-            <span className="text-purple-400">Claude 3.5 Sonnet + MCP</span>
+          <div className="liquid-glass p-5 rounded-2xl text-left border border-white/[0.08]">
+            <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1">
+              False Positive Rate
+            </div>
+            <div className="text-3xl font-extrabold text-white font-mono">0.0%</div>
+            <div className="text-[11px] text-zinc-400 mt-1 font-mono">
+              Skeptic Cleared Family Cluster
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-zinc-500">POLICY:</span>
-            <span className="text-amber-400">Rule F4 Enforced</span>
+          <div className="liquid-glass p-5 rounded-2xl text-left border border-white/[0.08]">
+            <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1">
+              Memory Recall SLA
+            </div>
+            <div className="text-3xl font-extrabold text-[#00ff66] font-mono">&lt; 5ms</div>
+            <div className="text-[11px] text-zinc-400 mt-1 font-mono">
+              Sub-5ms Associative Citation
+            </div>
+          </div>
+          <div className="liquid-glass p-5 rounded-2xl text-left border border-white/[0.08]">
+            <div className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-1">
+              Planted Entities
+            </div>
+            <div className="text-3xl font-extrabold text-white font-mono">~1,500</div>
+            <div className="text-[11px] text-zinc-400 mt-1 font-mono">
+              Deterministic Synthetics
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Four Core Pillars Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-xs font-mono uppercase tracking-widest text-[#00ff66] mb-2">
+            Engine Architecture
+          </h2>
+          <h3 className="text-3xl sm:text-4xl font-bold font-sans">
+            Engineered for High-Stakes Forensic Accuracy
+          </h3>
+          <p className="mt-4 text-zinc-400 text-sm max-w-2xl mx-auto">
+            Traditional fraud engines look at transactions in isolation. SENGRA models financial crime as a dynamic multi-dimensional graph.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Pillar 1 */}
+          <div className="liquid-glass-card p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[#00ff66]/30 flex items-center justify-center text-[#00ff66] mb-4">
+                <Network className="w-5 h-5" />
+              </div>
+              <h4 className="text-base font-bold text-white mb-2">
+                Multi-Hop Graph Analytics
+              </h4>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                FalkorDB Cloud subgraphs paired with Graphology in-memory Louvain modularity, betweenness centrality, and weakly connected components.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-[#00ff66]">
+              O(1) Indexed Traversal &rarr;
+            </div>
+          </div>
+
+          {/* Pillar 2 */}
+          <div className="liquid-glass-card p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[#00ff66]/30 flex items-center justify-center text-[#00ff66] mb-4">
+                <Cpu className="w-5 h-5" />
+              </div>
+              <h4 className="text-base font-bold text-white mb-2">
+                Sarvam 105B Reasoning
+              </h4>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Large language models equipped with 15 MCP tools to orchestrate entity recalls, skeptic challenges, and forensic explanations in plain English.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-[#00ff66]">
+              Sarvam AI Integration &rarr;
+            </div>
+          </div>
+
+          {/* Pillar 3 */}
+          <div className="liquid-glass-card p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[#00ff66]/30 flex items-center justify-center text-[#00ff66] mb-4">
+                <Lock className="w-5 h-5" />
+              </div>
+              <h4 className="text-base font-bold text-white mb-2">
+                Rule F4 Freeze Gating
+              </h4>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Guaranteed freeze safety: actions require &gt;=3 flagged accounts and &lt;=2 hops to known-bad devices. Includes Skeptic challenge to prevent false customer locks.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-[#00ff66]">
+              Deterministic Policy &rarr;
+            </div>
+          </div>
+
+          {/* Pillar 4 */}
+          <div className="liquid-glass-card p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-[#00ff66]/30 flex items-center justify-center text-[#00ff66] mb-4">
+                <ShieldAlert className="w-5 h-5" />
+              </div>
+              <h4 className="text-base font-bold text-white mb-2">
+                Cross-Domain CVE Bridge
+              </h4>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Bridges infrastructure vulnerabilities (CVE-2024-3094 SSH backdoor) to stolen credentials, compromised accounts, and automated P0 critical prioritization.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-[#00ff66]">
+              Security Bonus Layer &rarr;
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Planted Fraud Syndicates Preview */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.08]">
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-4">
+          <div>
+            <span className="text-xs font-mono uppercase tracking-widest text-[#00ff66]">
+              Empirical Benchmarks
+            </span>
+            <h3 className="text-3xl font-bold font-sans mt-2">
+              Planted Benchmark Syndicates
+            </h3>
+            <p className="text-zinc-400 text-sm mt-1 max-w-xl">
+              Inspect how the graph engine handles circular layering, benign family clusters, and structuring smurfing rings.
+            </p>
           </div>
           <Link
             href="/compare"
-            className="px-2.5 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-mono transition-colors"
+            className="px-4 py-2 rounded-lg liquid-glass border border-white/10 hover:border-[#00ff66]/40 text-xs font-mono text-zinc-300 hover:text-white transition-colors"
           >
-            Benchmark View &rarr;
-          </Link>
-          <Link
-            href="/security"
-            className="px-2.5 py-1 rounded bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs font-mono transition-colors"
-          >
-            Security Ops &rarr;
-          </Link>
-          <Link
-            href="/memory"
-            className="px-2.5 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-colors"
-          >
-            Memory Explorer &rarr;
+            View Full Benchmark Matrix &rarr;
           </Link>
         </div>
-      </header>
 
-      {/* Main 3-Column Layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Rail: Scenarios & Controls */}
-        <aside className="w-80 border-r border-zinc-800 bg-zinc-900/60 p-4 flex flex-col gap-4 overflow-y-auto">
-          <div>
-            <h2 className="text-xs font-mono uppercase text-zinc-400 tracking-wider mb-2">
-              Planted Scenarios
-            </h2>
-            <div className="flex flex-col gap-2">
-              {Object.entries(DEMO_SCENARIOS).map(([key, item]) => {
-                const isActive = activeScenarioKey === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => handleSelectScenario(key)}
-                    className={`text-left p-3 rounded-lg border transition-all ${
-                      isActive
-                        ? "border-cyan-500/60 bg-cyan-950/20 shadow-[0_0_12px_rgba(6,182,212,0.15)]"
-                        : "border-zinc-800 bg-zinc-950/40 hover:border-zinc-700"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold text-zinc-200">{item.name}</span>
-                    </div>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded border inline-block mb-1.5 font-mono ${item.badgeColor}`}>
-                      {item.badge}
-                    </span>
-                    <p className="text-[11px] text-zinc-400 leading-relaxed line-clamp-2">
-                      {item.description}
-                    </p>
-                  </button>
-                );
-              })}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Ring A */}
+          <div className="liquid-glass p-6 rounded-2xl border border-red-500/20">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-mono font-bold text-red-400 uppercase">
+                Ring A · Mule Syndicate
+              </span>
+              <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-400 text-[10px] font-mono border border-red-500/30">
+                CRITICAL
+              </span>
+            </div>
+            <h4 className="text-lg font-bold text-white mb-2">8-Account Collector Ring</h4>
+            <p className="text-xs text-zinc-400 leading-relaxed mb-4">
+              Victim mules transferring structured sums into a collector account connected to known-bad fraud device D-17.
+            </p>
+            <div className="p-3 rounded-lg bg-black/50 border border-white/[0.06] font-mono text-[11px] text-zinc-300">
+              <div className="text-red-400 font-bold mb-1">Graph Verdict: FREEZE</div>
+              <div>Confidence: 95% · Gated Freeze Approved</div>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-zinc-800">
-            <h2 className="text-xs font-mono uppercase text-zinc-400 tracking-wider mb-2">
-              Graph Layout
-            </h2>
-            <div className="grid grid-cols-2 gap-2">
-              {["concentric", "breadthfirst", "circle"].map((name) => (
-                <button
-                  key={name}
-                  type="button"
-                  onClick={() => setLayoutName(name)}
-                  className={`text-xs capitalize py-1.5 px-3 rounded border font-mono transition-all ${
-                    layoutName === name
-                      ? "border-cyan-500 bg-cyan-500/20 text-cyan-300"
-                      : "border-zinc-800 bg-zinc-950/40 text-zinc-400 hover:text-zinc-200"
-                  }`}
-                >
-                  {name}
-                </button>
-              ))}
+          {/* Ring B */}
+          <div className="liquid-glass p-6 rounded-2xl border border-emerald-500/20">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-mono font-bold text-emerald-400 uppercase">
+                Ring B · Benign Household
+              </span>
+              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono border border-emerald-500/30">
+                CLEARED
+              </span>
+            </div>
+            <h4 className="text-lg font-bold text-white mb-2">5-Member Family Cluster</h4>
+            <p className="text-xs text-zinc-400 leading-relaxed mb-4">
+              Innocent family members sharing home Wi-Fi and residential address. Flat rules lock them; Skeptic clears them.
+            </p>
+            <div className="p-3 rounded-lg bg-black/50 border border-white/[0.06] font-mono text-[11px] text-zinc-300">
+              <div className="text-[#00ff66] font-bold mb-1">Graph Verdict: NO_ACTION</div>
+              <div>Confidence: 92% · Zero Customer Friction</div>
             </div>
           </div>
 
-          {investigationResult?.evidencePath && (
-            <div className="pt-2 border-t border-zinc-800">
-              <button
-                type="button"
-                onClick={handleReplayAnimation}
-                className="w-full py-2 px-3 rounded border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-xs font-mono flex items-center justify-center gap-2 transition-all"
+          {/* Ring C */}
+          <div className="liquid-glass p-6 rounded-2xl border border-amber-500/20">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-mono font-bold text-amber-400 uppercase">
+                Ring C · Smurfing Ring
+              </span>
+              <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] font-mono border border-amber-500/30">
+                AML ALERT
+              </span>
+            </div>
+            <h4 className="text-lg font-bold text-white mb-2">Structuring Below Threshold</h4>
+            <p className="text-xs text-zinc-400 leading-relaxed mb-4">
+              4 feeder accounts executing fan-in payments under $10,000 reporting limits into a centralized funnel account.
+            </p>
+            <div className="p-3 rounded-lg bg-black/50 border border-white/[0.06] font-mono text-[11px] text-zinc-300">
+              <div className="text-amber-400 font-bold mb-1">Graph Verdict: HOLD_REVIEW</div>
+              <div>Confidence: 89% · Fan-In Unmasked</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Banner */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="liquid-glass-neon p-10 sm:p-14 rounded-3xl text-center relative overflow-hidden">
+          <div className="relative z-10 max-w-3xl mx-auto">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-white font-sans">
+              Experience the Full Visual Forensic Workbench
+            </h3>
+            <p className="mt-4 text-zinc-300 text-sm leading-relaxed">
+              Open the interactive canvas powered by HTML5 physics, run live scenarios, inspect animated money laundering paths, and converse with the Sarvam 105B copilot.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <Link
+                href="/dashboard"
+                className="px-8 py-3.5 rounded-xl neon-button text-sm font-mono font-bold"
               >
-                <span>▶ REPLAY PATH ANIMATION</span>
-              </button>
-            </div>
-          )}
-
-          <div className="mt-auto pt-4 border-t border-zinc-800">
-            <button
-              type="button"
-              onClick={handleRunInvestigation}
-              disabled={isInvestigating}
-              className={`w-full py-2.5 px-4 rounded-lg font-mono text-xs font-bold transition-all shadow-lg flex items-center justify-center gap-2 ${
-                isInvestigating
-                  ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                  : "bg-cyan-500 hover:bg-cyan-400 text-zinc-950 shadow-cyan-500/20 active:scale-95"
-              }`}
-            >
-              {isInvestigating ? (
-                <>
-                  <div className="h-3 w-3 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin" />
-                  ANALYZING SUBGRAPH...
-                </>
-              ) : (
-                <>
-                  <span>TRIGGER INVESTIGATION</span>
-                  <span>→</span>
-                </>
-              )}
-            </button>
-          </div>
-        </aside>
-
-        {/* Center: Interactive Cytoscape Canvas & Metrics Bar */}
-        <main className="flex-1 flex flex-col relative bg-zinc-950">
-          <MetricsBar
-            metrics={investigationResult?.metrics}
-            nodeCount={currentScenario.nodes.length}
-            edgeCount={currentScenario.edges.length}
-          />
-
-          {/* Canvas Toolbar & Legend */}
-          <div className="absolute top-12 left-4 z-10 flex items-center gap-4 px-3 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/90 backdrop-blur text-xs font-mono">
-            <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />
-              <span className="text-zinc-300">Account</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-purple-500" />
-              <span className="text-zinc-300">Device</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_6px_#ef4444]" />
-              <span className="text-red-400 font-semibold">Bad Device (D-17)</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
-              <span className="text-zinc-300">Address</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-              <span className="text-zinc-300">Card</span>
+                Launch Dashboard Console &rarr;
+              </Link>
             </div>
           </div>
-
-          <div className="flex-1 relative">
-            <GraphCanvas
-              elements={cytoscapeElements}
-              layoutName={layoutName}
-              onNodeClick={(data) => setSelectedNode(data)}
-              highlightedNodeIds={highlightedNodeIds}
-              animatingPath={animatingPath}
-              onAnimationStep={(_, subtitle) => setActiveSubtitle(subtitle)}
-              onAnimationComplete={() => {
-                setTimeout(() => setActiveSubtitle(null), 3000);
-              }}
-              activeSubtitle={activeSubtitle}
-            />
-          </div>
-
-          {/* Node Inspector Floating Pill */}
-          {selectedNode && (
-            <div className="absolute bottom-4 left-4 z-10 max-w-sm p-3 rounded-lg border border-zinc-700 bg-zinc-900/95 backdrop-blur shadow-2xl text-xs font-mono">
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-1.5 mb-1.5">
-                <span className="font-bold text-cyan-400">{selectedNode.label}: {selectedNode.id}</span>
-                <button
-                  type="button"
-                  onClick={() => setSelectedNode(null)}
-                  className="text-zinc-500 hover:text-zinc-200"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="text-zinc-400 space-y-0.5">
-                <div><span className="text-zinc-600">Name:</span> {selectedNode.name || "N/A"}</div>
-                <div><span className="text-zinc-600">Threat:</span> {selectedNode.known_bad ? "CONFIRMED MALICIOUS" : "NORMAL"}</div>
-              </div>
-            </div>
-          )}
-        </main>
-
-        {/* Right Rail: Structured CaseCard & TracePanel */}
-        <aside className="w-96 border-l border-zinc-800 bg-zinc-900/60 p-4 flex flex-col gap-4 overflow-y-auto">
-          {investigationResult ? (
-            <div className="flex flex-col gap-4">
-              <CaseCard
-                result={investigationResult}
-                onPathSelect={(nodeId) => setSelectedNode({ id: nodeId, label: "Path Step" })}
-              />
-              <TracePanel
-                trace={investigationResult.trace}
-                onStepClick={(step) => console.log("Trace step clicked:", step.toolName)}
-              />
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center flex-1 text-center p-6 text-zinc-600 font-mono text-xs">
-              <div className="h-8 w-8 rounded-full border border-zinc-800 flex items-center justify-center mb-2">
-                ?
-              </div>
-              Select a scenario on the left rail and click "Trigger Investigation" to run multi-step agent reasoning with live animated path traversal.
-            </div>
-          )}
-        </aside>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

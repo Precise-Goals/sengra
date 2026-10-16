@@ -168,11 +168,21 @@ python scripts/verify_gates.py
 
 ## 7. Architecture & References
 
-* **System Architecture**: [docs/architecture.md](docs/architecture.md)
-* **Evaluation Benchmark Report**: [docs/eval-report.md](docs/eval-report.md)
-* **Harness & Roles Specification**: [docs/harness.md](docs/harness.md)
-* **Operating Prompt & Boot Sequence**: [docs/prompt.md](docs/prompt.md)
-* **Lessons & Anti-Patterns Log**: [docs/memory/lessons.md](docs/memory/lessons.md)
+All architectural, operational, and tool documentation is organized inside [`docs/`](docs/):
+
+* **Agent Roster & Commands**: [`docs/AGENTS.md`](docs/AGENTS.md)
+* **Operating Prompt & Boot Sequence**: [`docs/prompt.md`](docs/prompt.md)
+* **Harness & Quality Gates**: [`docs/harness.md`](docs/harness.md)
+* **Multi-Client MCP Configuration**: [`docs/mcp.md`](docs/mcp.md)
+* **12-Server Exhaustive MCP Guide**: [`docs/mcpguide.md`](docs/mcpguide.md)
+* **Assistant Orientation Guide**: [`docs/CLAUDE.md`](docs/CLAUDE.md)
+* **System Architecture**: [`docs/architecture.md`](docs/architecture.md)
+* **Evaluation Benchmark Report**: [`docs/eval-report.md`](docs/eval-report.md)
+* **Cypher Query Reference & Constraints**: [`docs/cypher.md`](docs/cypher.md)
+* **Troubleshooting & Known Limitations**: [`docs/troubleshooting.md`](docs/troubleshooting.md)
+* **Lessons & Anti-Patterns Log**: [`docs/memory/lessons.md`](docs/memory/lessons.md)
+* **Project Assumptions**: [`docs/memory/assumptions.md`](docs/memory/assumptions.md)
+
 
 ---
 

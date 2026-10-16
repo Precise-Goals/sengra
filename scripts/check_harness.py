@@ -78,7 +78,23 @@ def _load(p):
 
 
 def check_required_files(root=ROOT):
-    return [f"missing: {p}" for p in REQUIRED if not (root / p).exists()]
+    agents_path = "docs/AGENTS.md" if (root / "docs/AGENTS.md").exists() else "AGENTS.md"
+    req = [
+        agents_path,
+        "docs/raw.md",
+        "docs/harness.md",
+        "docs/prompt.md",
+        "harness/state/state.json",
+        "harness/state/state.schema.json",
+        "harness/state/budgets.json",
+        "harness/tools/registry.yaml",
+        "harness/tools/sandbox.md",
+        "harness/workflows/pipeline.md",
+        "harness/standards/handoff-contract.md",
+        "harness/standards/definition-of-done.md",
+        "harness/logs/events.jsonl",
+    ]
+    return [f"missing: {p}" for p in req if not (root / p).exists()]
 
 
 def check_harness_md(root=ROOT):
@@ -120,14 +136,14 @@ def check_agents_and_roles(root=ROOT):
 
 
 def check_agents_md(root=ROOT):
-    p = root / "AGENTS.md"
+    p = root / "docs/AGENTS.md" if (root / "docs/AGENTS.md").exists() else root / "AGENTS.md"
     if not p.exists():
         return ["AGENTS.md missing"]
     text = p.read_text(encoding="utf-8")
     errs = ["AGENTS.md exceeds 150 lines"] if len(text.splitlines()) > 150 else []
     for link in re.findall(r"\]\((?!https?://|#|mailto:)([^)\s]+)\)", text):
         target = link.split("#")[0]
-        if target and not (root / target).exists():
+        if target and not (root / target).exists() and not (root / "docs" / target).exists():
             errs.append(f"AGENTS.md broken link: {link}")
     return errs
 
@@ -191,7 +207,16 @@ CONFIGURABLE = [
 def check_unconfigured(root=ROOT):
     """Existing-but-not-configured files: blank or still holding template placeholders."""
     errs = []
-    for base in CONFIGURABLE:
+    configurable = [
+        "docs/AGENTS.md" if (root / "docs/AGENTS.md").exists() else "AGENTS.md",
+        "harness/agents",
+        "harness/roles",
+        "harness/standards",
+        "harness/workflows",
+        "harness/tools",
+        "harness/backlog.md",
+    ]
+    for base in configurable:
         p = root / base
         files = [p] if p.is_file() else sorted(p.rglob("*")) if p.exists() else []
         for f in files:

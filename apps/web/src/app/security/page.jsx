@@ -5,33 +5,28 @@ import Link from "next/link";
 import {
   ShieldAlert,
   ShieldCheck,
-  AlertTriangle,
   Flame,
   ArrowRight,
-  Server,
-  Lock,
   UserX,
-  Database,
+  Layers,
   Radio,
   CheckCircle2,
-  BellRing,
   RefreshCw,
-  Layers,
 } from "lucide-react";
-import { GraphCanvas, toCytoscapeElements } from "@sengra/ui";
+import NetworkXGraphVisualizer from "../../components/NetworkXGraphVisualizer";
 
 const SECURITY_GRAPH_DATA = {
   nodes: [
-    { id: "CVE-2024-3094", label: "CVE", name: "CVE-2024-3094 (CVSS 10.0)", severity: "CRITICAL" },
-    { id: "PKG-XZ-UTILS", label: "Package", name: "xz-utils@5.6.0" },
-    { id: "SVC-AUTH-PORTAL", label: "Service", name: "Auth Portal (SSO Gateway)", tier: "TIER_0" },
-    { id: "SVC-PAYMENT-CORE", label: "Service", name: "Payment Core Engine", tier: "TIER_0" },
-    { id: "DB-USER-CREDENTIALS", label: "Datastore", name: "User Credential DB (PII)" },
-    { id: "CRED-LEAKED-HASH", label: "Credential", name: "Leaked Hashes", compromised: true },
-    { id: "A-TAKEOVER-1", label: "Account", name: "Victim Account 1", flagged: true },
-    { id: "A-TAKEOVER-2", label: "Account", name: "Victim Account 2", flagged: true },
-    { id: "A-TAKEOVER-3", label: "Account", name: "Victim Account 3", flagged: true },
-    { id: "A-TAKEOVER-4", label: "Account", name: "Victim Account 4", flagged: true },
+    { id: "CVE-2024-3094", label: "CVE", name: "CVE-2024-3094 (CVSS 10.0)", known_bad: true, tier: 0 },
+    { id: "PKG-XZ-UTILS", label: "Device", name: "xz-utils@5.6.0 (Liblzma)", tier: 1 },
+    { id: "SVC-AUTH-PORTAL", label: "Device", name: "Auth Portal (SSO Gateway)", tier: 1 },
+    { id: "SVC-PAYMENT-CORE", label: "Device", name: "Payment Core Engine", tier: 2 },
+    { id: "DB-USER-CREDENTIALS", label: "Address", name: "User DB (Credentials)", tier: 3 },
+    { id: "CRED-LEAKED-HASH", label: "IPAddress", name: "Leaked Credential Hashes", tier: 2 },
+    { id: "A-TAKEOVER-1", label: "Account", name: "Victim Account 1", flagged: true, tier: 2 },
+    { id: "A-TAKEOVER-2", label: "Account", name: "Victim Account 2", flagged: true, tier: 2 },
+    { id: "A-TAKEOVER-3", label: "Account", name: "Victim Account 3", flagged: true, tier: 2 },
+    { id: "A-TAKEOVER-4", label: "Account", name: "Victim Account 4", flagged: true, tier: 2 },
   ],
   edges: [
     { source: "PKG-XZ-UTILS", target: "CVE-2024-3094", type: "AFFECTED_BY" },
@@ -54,231 +49,157 @@ export default function SecurityPage() {
     paged: false,
   });
 
-  const cytoscapeElements = toCytoscapeElements(
-    SECURITY_GRAPH_DATA.nodes,
-    SECURITY_GRAPH_DATA.edges
-  );
-
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans selection:bg-purple-500/30 selection:text-purple-200">
-      {/* Top Header */}
-      <header className="h-16 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur px-6 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold">
-            <ShieldAlert className="w-4 h-4" />
-          </div>
-          <div>
-            <h1 className="text-sm font-semibold tracking-wide text-zinc-100 flex items-center gap-2">
-              SENGRA <span className="text-zinc-500">/</span> SECURITY BONUS LAYER
+    <div className="flex-1 flex flex-col bg-[#020408] text-white py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full selection:bg-purple-500/30 selection:text-purple-200">
+      {/* Top Incident Status Banner */}
+      <div className="mb-6 liquid-glass p-5 rounded-2xl border border-red-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-xl font-bold font-sans text-white">
+              Security Ops · Infrastructure Vulnerability Bridge
             </h1>
-            <p className="text-xs text-zinc-400">
-              Cross-Domain Vulnerability &amp; Financial Fraud Bridge Operations
-            </p>
+            <span className="px-2.5 py-0.5 rounded text-xs font-mono font-semibold bg-red-500/20 text-red-400 border border-red-500/40">
+              P0 CRITICAL INCIDENT
+            </span>
           </div>
+          <p className="text-xs text-zinc-400 font-sans max-w-2xl">
+            Correlating upstream Linux SSH backdoor (CVE-2024-3094) directly through compromised authentication portals into live financial account takeovers.
+          </p>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-            P0 INCIDENT ACTIVE
+        <div className="flex items-center gap-4 bg-black/60 p-3 rounded-xl border border-white/[0.06]">
+          <div className="text-right">
+            <div className="text-[10px] font-mono text-zinc-400 uppercase">Containment SLA</div>
+            <div className="font-mono text-sm font-bold text-red-400">1 HOUR (P0)</div>
           </div>
-          <Link
-            href="/about"
-            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors"
-          >
-            The Problem
-          </Link>
-          <Link
-            href="/docs"
-            className="px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-mono transition-colors"
-          >
-            Solution Docs
-          </Link>
-          <Link
-            href="/compare"
-            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors"
-          >
-            Benchmark View
-          </Link>
-          <Link
-            href="/memory"
-            className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-colors"
-          >
-            Memory Explorer
-          </Link>
-          <Link
-            href="/dashboard"
-            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors flex items-center gap-1.5"
-          >
-            Dashboard
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
-        {/* Security Metric Cards */}
-        <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-zinc-900/40 border border-red-500/30 rounded-xl p-4 relative overflow-hidden">
-            <div className="text-xs text-red-400 font-mono uppercase tracking-wider mb-1 flex items-center justify-between">
-              Critical CVE
-              <Flame className="w-4 h-4 text-red-400" />
-            </div>
-            <div className="text-xl font-bold font-mono text-zinc-100">CVE-2024-3094</div>
-            <div className="mt-1 text-xs text-zinc-400">CVSS 10.0 · Remote Code Execution</div>
-          </div>
-
-          <div className="bg-zinc-900/40 border border-purple-500/30 rounded-xl p-4 relative overflow-hidden">
-            <div className="text-xs text-purple-400 font-mono uppercase tracking-wider mb-1 flex items-center justify-between">
-              Compromised Accounts
-              <UserX className="w-4 h-4 text-purple-400" />
-            </div>
-            <div className="text-xl font-bold font-mono text-zinc-100">4 Accounts</div>
-            <div className="mt-1 text-xs text-zinc-400">Targeted via leaked credential hash</div>
-          </div>
-
-          <div className="bg-zinc-900/40 border border-cyan-500/30 rounded-xl p-4 relative overflow-hidden">
-            <div className="text-xs text-cyan-400 font-mono uppercase tracking-wider mb-1 flex items-center justify-between">
-              Downstream Blast Radius
-              <Layers className="w-4 h-4 text-cyan-400" />
-            </div>
-            <div className="text-xl font-bold font-mono text-zinc-100">7 Assets</div>
-            <div className="mt-1 text-xs text-zinc-400">Payment Core, User DB, Redis Cache</div>
-          </div>
-
-          <div className="bg-zinc-900/40 border border-emerald-500/30 rounded-xl p-4 relative overflow-hidden">
-            <div className="text-xs text-emerald-400 font-mono uppercase tracking-wider mb-1 flex items-center justify-between">
-              Interception Status
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            </div>
-            <div className="text-xl font-bold font-mono text-emerald-400">CONTAINED</div>
-            <div className="mt-1 text-xs text-zinc-400">Zero unauthorized transfer exits</div>
-          </div>
-        </section>
-
-        {/* Interactive Visualizer and Side Panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Cytoscape Graph Canvas (2 Columns) */}
-          <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 flex flex-col h-[560px]">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-800 mb-3">
-              <div className="flex items-center gap-2">
-                <Radio className="w-4 h-4 text-purple-400 animate-pulse" />
-                <h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-200">
-                  Cross-Domain Vulnerability Bridge Graph
-                </h3>
-              </div>
-              <span className="text-[11px] font-mono text-zinc-400">
-                CVE &rarr; Package &rarr; Service &rarr; Credential &rarr; Fraud Accounts
-              </span>
-            </div>
-
-            <div className="flex-1 rounded-xl overflow-hidden bg-black/40 border border-zinc-800/80">
-              <GraphCanvas
-                elements={cytoscapeElements}
-                onSelectNode={(node) => setSelectedNode(node)}
-                highlightedNodeIds={[
-                  "CVE-2024-3094",
-                  "PKG-XZ-UTILS",
-                  "SVC-AUTH-PORTAL",
-                  "CRED-LEAKED-HASH",
-                  "A-TAKEOVER-1",
-                ]}
-              />
-            </div>
-          </div>
-
-          {/* Right Rail: Findings & Actions */}
-          <div className="space-y-4">
-            {/* Finding Priority Breakdown */}
-            <div className="bg-zinc-900/50 border border-red-500/30 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-mono text-zinc-400 uppercase">Finding Priority</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-500/20 text-red-400 border border-red-500/30">
-                  P0 CRITICAL
-                </span>
-              </div>
-              <div className="text-2xl font-bold font-mono text-zinc-100">
-                Score: 98 <span className="text-xs text-zinc-500 font-sans">/ 100</span>
-              </div>
-              <p className="text-xs text-zinc-300 mt-2 leading-relaxed">
-                Emergency escalation: Internet-exposed authentication gateway affected by CVSS 10.0 backdoor actively exploited to take over 4 accounts.
-              </p>
-
-              <div className="mt-3 pt-3 border-t border-zinc-800/80 space-y-1.5 text-[11px] font-mono">
-                <div className="flex justify-between text-zinc-400">
-                  <span>Base CVSS (10.0 &times; 5):</span>
-                  <span className="text-zinc-200">50 pts</span>
-                </div>
-                <div className="flex justify-between text-zinc-400">
-                  <span>Internet Exposure Multiplier:</span>
-                  <span className="text-zinc-200">+20 pts</span>
-                </div>
-                <div className="flex justify-between text-zinc-400">
-                  <span>Customer PII Access:</span>
-                  <span className="text-zinc-200">+15 pts</span>
-                </div>
-                <div className="flex justify-between text-emerald-400 font-semibold">
-                  <span>Active Fraud Linkage:</span>
-                  <span>+50 pts</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Incident Escalation Actions */}
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 space-y-3">
-              <h4 className="text-xs font-mono uppercase text-zinc-400 tracking-wider">
-                Automated Incident Mitigation
-              </h4>
-
-              <button
-                onClick={() => setRemediated((prev) => ({ ...prev, credentialsRevoked: true }))}
-                className={`w-full py-2 px-3 rounded-lg text-xs font-medium flex items-center justify-between border transition-all ${
-                  remediated.credentialsRevoked
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                    : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <Lock className="w-3.5 h-3.5" />
-                  Revoke Leaked Credentials
-                </span>
-                {remediated.credentialsRevoked ? <CheckCircle2 className="w-4 h-4" /> : <span>Execute</span>}
-              </button>
-
-              <button
-                onClick={() => setRemediated((prev) => ({ ...prev, accountsFrozen: true }))}
-                className={`w-full py-2 px-3 rounded-lg text-xs font-medium flex items-center justify-between border transition-all ${
-                  remediated.accountsFrozen
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                    : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <UserX className="w-3.5 h-3.5" />
-                  Freeze 4 Compromised Accounts
-                </span>
-                {remediated.accountsFrozen ? <CheckCircle2 className="w-4 h-4" /> : <span>Execute</span>}
-              </button>
-
-              <button
-                onClick={() => setRemediated((prev) => ({ ...prev, paged: true }))}
-                className={`w-full py-2 px-3 rounded-lg text-xs font-medium flex items-center justify-between border transition-all ${
-                  remediated.paged
-                    ? "bg-purple-500/10 border-purple-500/30 text-purple-400"
-                    : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <BellRing className="w-3.5 h-3.5" />
-                  Page On-Call (@devin.oncall)
-                </span>
-                {remediated.paged ? <CheckCircle2 className="w-4 h-4" /> : <span>Page</span>}
-              </button>
-            </div>
+          <div className="w-px h-8 bg-white/10" />
+          <div className="text-left">
+            <div className="text-[10px] font-mono text-zinc-400 uppercase">Impact Score</div>
+            <div className="font-mono text-sm font-bold text-purple-400">98 / 100</div>
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* Security Metric Cards */}
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="liquid-glass p-4 rounded-xl border border-red-500/30">
+          <div className="text-xs text-red-400 font-mono uppercase tracking-wider mb-1 flex items-center justify-between">
+            <span>Critical CVE</span>
+            <Flame className="w-4 h-4 text-red-400" />
+          </div>
+          <div className="text-xl font-bold font-mono text-white">CVE-2024-3094</div>
+          <div className="text-[11px] text-zinc-400 mt-1 font-mono">CVSS 10.0 · Liblzma Backdoor</div>
+        </div>
+
+        <div className="liquid-glass p-4 rounded-xl border border-purple-500/30">
+          <div className="text-xs text-purple-400 font-mono uppercase tracking-wider mb-1 flex items-center justify-between">
+            <span>Compromised Accounts</span>
+            <UserX className="w-4 h-4 text-purple-400" />
+          </div>
+          <div className="text-xl font-bold font-mono text-white">4 Accounts</div>
+          <div className="text-[11px] text-zinc-400 mt-1 font-mono">Targeted via leaked hash credentials</div>
+        </div>
+
+        <div className="liquid-glass p-4 rounded-xl border border-cyan-500/30">
+          <div className="text-xs text-cyan-400 font-mono uppercase tracking-wider mb-1 flex items-center justify-between">
+            <span>Downstream Blast Radius</span>
+            <Layers className="w-4 h-4 text-cyan-400" />
+          </div>
+          <div className="text-xl font-bold font-mono text-white">7 Assets Reachable</div>
+          <div className="text-[11px] text-zinc-400 mt-1 font-mono">Payment Core, User DB, Redis Cache</div>
+        </div>
+
+        <div className="liquid-glass p-4 rounded-xl border border-emerald-500/30">
+          <div className="text-xs text-emerald-400 font-mono uppercase tracking-wider mb-1 flex items-center justify-between">
+            <span>Interception Status</span>
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div className="text-xl font-bold font-mono text-emerald-400">CONTAINED</div>
+          <div className="text-[11px] text-zinc-400 mt-1 font-mono">Zero unauthorized fund dissipation</div>
+        </div>
+      </section>
+
+      {/* Main Dynamic HTML5 Canvas Physics Graph Visualizer for Security (Full Width) */}
+      <div className="w-full h-[580px] rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl relative mb-6">
+        <NetworkXGraphVisualizer
+          nodes={SECURITY_GRAPH_DATA.nodes}
+          edges={SECURITY_GRAPH_DATA.edges}
+          layoutMode="shockwave"
+          selectedNodeId={selectedNode?.id}
+          onSelectNode={setSelectedNode}
+          highlightPath={[
+            "CVE-2024-3094",
+            "PKG-XZ-UTILS",
+            "SVC-AUTH-PORTAL",
+            "CRED-LEAKED-HASH",
+            "A-TAKEOVER-1",
+          ]}
+          evidenceSubtitles="Shockwave blast radius: CVE-2024-3094 -> xz-utils -> Auth Portal -> Leaked Credentials -> 4 Compromised Customer Accounts."
+        />
+      </div>
+
+      {/* Incident Remediation & Automated Mitigation Deck */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="liquid-glass p-5 rounded-2xl border border-white/[0.08]">
+          <h3 className="text-sm font-bold text-white mb-2 font-sans">
+            1. Autonomous Credential Revocation
+          </h3>
+          <p className="text-xs text-zinc-400 leading-relaxed mb-4">
+            Invalidates all active JWT tokens and sessions issued through the compromised authentication portal.
+          </p>
+          <button
+            type="button"
+            onClick={() => setRemediated((prev) => ({ ...prev, credentialsRevoked: true }))}
+            className={`w-full py-2.5 px-4 rounded-xl text-xs font-mono font-bold transition-all ${
+              remediated.credentialsRevoked
+                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                : "neon-button"
+            }`}
+          >
+            {remediated.credentialsRevoked ? "✓ Credentials Revoked" : "Revoke Active Sessions"}
+          </button>
+        </div>
+
+        <div className="liquid-glass p-5 rounded-2xl border border-white/[0.08]">
+          <h3 className="text-sm font-bold text-white mb-2 font-sans">
+            2. Rule F4 Autonomous Freeze Gating
+          </h3>
+          <p className="text-xs text-zinc-400 leading-relaxed mb-4">
+            Isolates the 4 compromised accounts and blocks all outgoing payment transfers pending KYC re-verification.
+          </p>
+          <button
+            type="button"
+            onClick={() => setRemediated((prev) => ({ ...prev, accountsFrozen: true }))}
+            className={`w-full py-2.5 px-4 rounded-xl text-xs font-mono font-bold transition-all ${
+              remediated.accountsFrozen
+                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                : "neon-button"
+            }`}
+          >
+            {remediated.accountsFrozen ? "✓ 4 Accounts Isolated" : "Execute Gated Freeze"}
+          </button>
+        </div>
+
+        <div className="liquid-glass p-5 rounded-2xl border border-white/[0.08]">
+          <h3 className="text-sm font-bold text-white mb-2 font-sans">
+            3. On-Call Incident Pager
+          </h3>
+          <p className="text-xs text-zinc-400 leading-relaxed mb-4">
+            Dispatches automated incident escalation to AppSec Core on-call engineer (<span className="text-white">Alex Chen</span>).
+          </p>
+          <button
+            type="button"
+            onClick={() => setRemediated((prev) => ({ ...prev, paged: true }))}
+            className={`w-full py-2.5 px-4 rounded-xl text-xs font-mono font-bold transition-all ${
+              remediated.paged
+                ? "bg-purple-500/20 text-purple-400 border border-purple-500/40"
+                : "liquid-glass border border-white/20 hover:border-white/40 text-white"
+            }`}
+          >
+            {remediated.paged ? "✓ PagerDuty Alert Dispatched" : "Dispatch On-Call Alert"}
+          </button>
+        </div>
+      </section>
     </div>
   );
 }

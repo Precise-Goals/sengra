@@ -707,8 +707,8 @@ export default function NetworkXGraphVisualizer({
           targetMap.set(nodeId, { x: centerX, y: centerY });
         });
 
-        // Ring radii
-        const ringRadii = { 1: 140, 2: 260, 3: 370 };
+        // Ring radii (tightened concentric clusters)
+        const ringRadii = { 1: 95, 2: 175, 3: 250 };
 
         for (let ring = 1; ring <= 3; ring++) {
           const idsInRing = hopBuckets[ring];
@@ -762,7 +762,7 @@ export default function NetworkXGraphVisualizer({
         y,
         vx,
         vy,
-        radius: isBad || isFrozen ? 26 : 22,
+        radius: isBad || isFrozen ? 38 : 32,
         isBad,
         isFrozen,
         isDragging: false,
@@ -859,10 +859,10 @@ export default function NetworkXGraphVisualizer({
         if (activeLayout === "fruchterman-reingold") {
           // Classic Fruchterman-Reingold Spring Layout
           // Area A = W * H, optimal distance k = C * sqrt(A / |V|)
-          const area = Math.max(width * height, 300000);
-          const kDistance = 0.72 * Math.sqrt(area / (nodes.length || 1));
+          const area = Math.max(width * height, 250000);
+          const kDistance = Math.min(110, Math.max(70, 0.42 * Math.sqrt(area / (nodes.length || 1))));
           const kDistSq = kDistance * kDistance;
-          const centerGravityK = 0.042;
+          const centerGravityK = 0.085;
           const centerX = width / 2;
           const centerY = height / 2;
 
@@ -1261,14 +1261,14 @@ export default function NetworkXGraphVisualizer({
 
         // Node Icon Glyph / Type Indicator
         const typeInfo = THEME.nodeTypes[node.label] || { glyph: "●", color: "#fff" };
-        ctx.font = "13px sans-serif";
+        ctx.font = "bold 16px sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#ffffff";
         ctx.fillText(typeInfo.glyph, node.x, node.y - 1);
 
         // Node Name & Tag Label
-        ctx.font = "bold 10px monospace";
+        ctx.font = "bold 12px monospace";
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         ctx.fillStyle = isSelected ? THEME.neonGreen : THEME.textPrimary;
@@ -1277,17 +1277,17 @@ export default function NetworkXGraphVisualizer({
 
         const displayName = node.name || node.id;
         const truncated =
-          displayName.length > 20
-            ? displayName.substring(0, 18) + ".."
+          displayName.length > 22
+            ? displayName.substring(0, 20) + ".."
             : displayName;
         ctx.fillText(truncated, node.x, node.y + node.radius + 6);
 
         // Badge Status Sub-label
         if (node.isBad || node.isFrozen) {
           const statusText = node.isFrozen ? "FROZEN" : "FLAGGED";
-          ctx.font = "bold 8px monospace";
+          ctx.font = "bold 10px monospace";
           ctx.fillStyle = node.isFrozen ? THEME.neonCyan : THEME.neonDanger;
-          ctx.fillText(statusText, node.x, node.y + node.radius + 18);
+          ctx.fillText(statusText, node.x, node.y + node.radius + 20);
         }
         ctx.shadowBlur = 0;
       });
